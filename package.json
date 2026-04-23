@@ -1,0 +1,71 @@
+{
+  "name": "folderscope",
+  "version": "1.0.0",
+  "description": "Desktop File Manager — Jelajahi dan cari file/folder dengan tampilan modern",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --inspect",
+    "build": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "build:installer": "electron-builder --win nsis"
+  },
+  "keywords": [
+    "file-manager",
+    "electron",
+    "desktop"
+  ],
+  "author": "FolderScope",
+  "license": "ISC",
+  "type": "commonjs",
+  "build": {
+    "appId": "com.folderscope.app",
+    "productName": "FolderScope",
+    "copyright": "Copyright © 2025 FolderScope",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FolderScope",
+      "installerIcon": "assets/icon.png",
+      "uninstallerIcon": "assets/icon.png",
+      "installerHeaderIcon": "assets/icon.png",
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "FolderScope-Portable-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1"
+  }
+}
