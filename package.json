@@ -22,6 +22,7 @@
     "appId": "com.folderscope.app",
     "productName": "FolderScope",
     "copyright": "Copyright © 2025 FolderScope",
+    "electronLanguages": ["id", "en-US"],
     "directories": {
       "output": "dist"
     },
@@ -55,9 +56,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "FolderScope",
-      "installerIcon": "assets/icon.png",
-      "uninstallerIcon": "assets/icon.png",
-      "installerHeaderIcon": "assets/icon.png",
       "deleteAppDataOnUninstall": false
     },
     "portable": {
