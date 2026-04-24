@@ -21,4 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // OS
   homeDir: () => ipcRenderer.invoke('os:homeDir'),
   platform: () => ipcRenderer.invoke('os:platform'),
+
+  // API Proxy
+  fetchData: (url) => ipcRenderer.invoke('api:fetch', url),
 });

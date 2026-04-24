@@ -16,6 +16,9 @@ const state = {
   sortBy: 'name-asc',
   isSearchMode: false,
   searchQuery: '',
+  ssData: [], // Store spreadsheet data
+  ssFilterQuery: '',
+  ssFilterStatus: 'all', // 'all' | 'complete' | 'incomplete'
 };
 
 // ─── File Type Definitions ────────────────────────────────────────────────────
@@ -382,6 +385,9 @@ async function pickFolder() {
   state.rootPath = folderPath;
   state.history = [];
 
+  // Simpan ke LocalStorage
+  localStorage.setItem('cached_root_path', folderPath);
+
   const name = basename(folderPath);
   $('target-name').textContent = name;
   $('target-path').textContent = truncatePath(folderPath);
@@ -516,3 +522,251 @@ document.addEventListener('keydown', (e) => {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 showEmpty();
+
+// ─── Spreadsheet View Logic ──────────────────────────────────────────────────
+const elNavExplorer = $('nav-explorer');
+const elNavSpreadsheet = $('nav-spreadsheet');
+const elSpreadsheetView = $('spreadsheet-view');
+
+function switchView(view) {
+  const elToolbar = document.querySelector('.toolbar');
+  if (view === 'explorer') {
+    elNavExplorer.classList.add('active');
+    elNavSpreadsheet.classList.remove('active');
+    elSpreadsheetView.style.display = 'none';
+    if (elToolbar) elToolbar.style.display = 'flex';
+    
+    // Restore Explorer Elements
+    if (!state.rootPath) showEmpty();
+    else showContent();
+
+    document.querySelectorAll('.sidebar-label').forEach(label => {
+      label.parentElement.style.display = '';
+    });
+  } else {
+    elNavExplorer.classList.remove('active');
+    elNavSpreadsheet.classList.add('active');
+    elSpreadsheetView.style.display = 'flex';
+    if (elToolbar) elToolbar.style.display = 'none';
+    
+    // Hide Explorer Elements
+    $('empty-state').style.display = 'none';
+    $('loading-state').style.display = 'none';
+    $('file-grid').style.display = 'none';
+    $('file-list-wrap').style.display = 'none';
+    elSearchHeader.style.display = 'none';
+
+    // Hide search & filter sidebar sections for clean spreadsheet view
+    document.querySelectorAll('.sidebar-label').forEach(label => {
+      if (label.textContent === 'PENCARIAN' || label.textContent === 'FILTER TIPE') {
+        label.parentElement.style.display = 'none';
+      }
+    });
+  }
+}
+
+elNavExplorer.addEventListener('click', () => switchView('explorer'));
+elNavSpreadsheet.addEventListener('click', () => switchView('spreadsheet'));
+
+// Fetch API Data
+$('btn-fetch-api').addEventListener('click', async () => {
+  const url = $('ss-api-url').value.trim();
+  if (!url) {
+    showToast('Masukkan URL API dulu!', 'error');
+    return;
+  }
+
+  const container = $('ss-table-container');
+  container.innerHTML = '<div class="ss-empty"><div class="spinner"></div><p>Sedang menarik data...</p></div>';
+
+  try {
+    const data = await window.electronAPI.fetchData(url);
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    
+    let processedData = data;
+    
+    if (!Array.isArray(processedData) && typeof processedData === 'object') {
+      const keys = Object.keys(processedData);
+      for (const key of keys) {
+        if (Array.isArray(processedData[key])) {
+          processedData = processedData[key];
+          break;
+        }
+      }
+    }
+
+    if (!Array.isArray(processedData)) {
+      throw new Error('Format data bukan Array. Pastikan API mengembalikan list objek.');
+    }
+
+    state.ssData = processedData; // Simpan ke state
+    
+    // Simpan ke LocalStorage agar pas buka aplikasi lagi datanya masih ada
+    localStorage.setItem('cached_ss_data', JSON.stringify(processedData));
+    localStorage.setItem('cached_ss_url', url);
+    localStorage.setItem('cached_ss_time', new Date().toISOString());
+
+    renderFilteredSS(); // Gunakan fungsi terpusat
+    showToast('Data berhasil dimuat! 🚀', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+    container.innerHTML = `<div class="ss-empty">
+      <div class="ss-empty-icon">❌</div>
+      <h3>Gagal memuat data</h3>
+      <p>${err.message}</p>
+    </div>`;
+  }
+});
+
+function renderSpreadsheet(data) {
+  if (data.length === 0) {
+    $('ss-table-container').innerHTML = '<div class="ss-empty"><h3>Data kosong</h3><p>API tidak mengembalikan record apapun.</p></div>';
+    return;
+  }
+
+  // Headers sesuai permintaan user
+  const headers = ['NO', 'KODE', 'NAME', 'Cat', 'UOM', 'P', 'L', 'T', 'B'];
+  // Mapping index dari data array API
+  const mapping = {
+    'NO': 1,
+    'KODE': 3,
+    'NAME': 4,
+    'Cat': 5,
+    'UOM': 6,
+    'P': 8,
+    'L': 9,
+    'T': 10,
+    'B': 11
+  };
+  
+  let html = '<table class="ss-table"><thead><tr>';
+  headers.forEach(h => {
+    html += `<th>${escHtml(h)}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  data.forEach((row, rowIndex) => {
+    // Skip jika row bukan array atau kosong
+    if (!Array.isArray(row)) return;
+
+    // Cek apakah data PLTB lengkap (tidak null, tidak kosong, tidak 0)
+    const p = row[8];
+    const l = row[9];
+    const t = row[10];
+    const b = row[11];
+    
+    const isIncomplete = !p || !l || !t || !b || p == 0 || l == 0 || t == 0;
+    const rowClass = isIncomplete ? 'row-incomplete' : '';
+
+    html += `<tr class="${rowClass}">`;
+    headers.forEach(h => {
+      const idx = mapping[h];
+      const val = row[idx];
+      const displayVal = (val === null || val === undefined) ? '—' : val;
+      
+      // Beri tanda merah khusus pada sel PLTB jika kosong
+      let cellClass = '';
+      if (['P', 'L', 'T', 'B'].includes(h) && (!val || val == 0)) {
+        cellClass = 'cell-warning';
+      }
+
+      html += `<td class="${cellClass}" title="${escHtml(String(displayVal))}">${escHtml(String(displayVal))}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  $('ss-table-container').innerHTML = html;
+}
+
+// ─── Logic Filtering & Pencarian Gabungan ───────────────────────────────────
+function renderFilteredSS() {
+  const query = state.ssFilterQuery.toLowerCase();
+  const status = state.ssFilterStatus;
+
+  if (!state.ssData || state.ssData.length === 0) return;
+
+  const filtered = state.ssData.filter(row => {
+    if (!Array.isArray(row)) return false;
+
+    // 1. Filter by Status (Lengkap/Tidak Lengkap)
+    const p = row[8]; const l = row[9]; const t = row[10]; const b = row[11];
+    
+    // Fungsi helper untuk cek apakah nilai dianggap "kosong" (null, undefined, "", "0", atau 0)
+    const isEmpty = (v) => v === null || v === undefined || String(v).trim() === "" || String(v).trim() === "0";
+    
+    const isIncomplete = isEmpty(p) || isEmpty(l) || isEmpty(t) || isEmpty(b);
+    
+    if (status === 'complete' && isIncomplete) return false;
+    if (status === 'incomplete' && !isIncomplete) return false;
+
+    // 2. Filter by Search Query
+    const searchableIndices = [1, 3, 4, 5, 6]; 
+    const matchesSearch = searchableIndices.some(idx => {
+      const val = String(row[idx] || '').toLowerCase();
+      return val.includes(query);
+    });
+
+    return matchesSearch;
+  });
+
+  renderSpreadsheet(filtered);
+}
+
+$('ss-search-input').addEventListener('input', (e) => {
+  state.ssFilterQuery = e.target.value.trim();
+  renderFilteredSS();
+});
+
+$('ss-status-filter').addEventListener('change', (e) => {
+  state.ssFilterStatus = e.target.value;
+  renderFilteredSS();
+});
+
+// ─── Inisialisasi Cache Spreadsheet ──────────────────────────────────────────
+function initSSCache() {
+  const cachedData = localStorage.getItem('cached_ss_data');
+  const cachedUrl = localStorage.getItem('cached_ss_url');
+  
+  if (cachedUrl) {
+    $('ss-api-url').value = cachedUrl;
+  }
+
+  if (cachedData) {
+    try {
+      state.ssData = JSON.parse(cachedData);
+      renderFilteredSS();
+      showToast('Memuat data dari penyimpanan lokal...', 'info');
+    } catch (e) {
+      console.error('Gagal memuat cache:', e);
+    }
+  }
+}
+
+// Jalankan init cache saat startup
+initSSCache();
+
+// ─── Inisialisasi Cache Explorer ─────────────────────────────────────────────
+async function initExplorerCache() {
+  const cachedRoot = localStorage.getItem('cached_root_path');
+  if (cachedRoot) {
+    state.rootPath = cachedRoot;
+    
+    // Update UI Sidebar
+    const name = basename(cachedRoot);
+    $('target-name').textContent = name;
+    $('target-path').textContent = truncatePath(cachedRoot);
+    $('target-card').classList.add('has-target');
+    $('btn-search').disabled = false;
+
+    // Navigasi ke folder tersebut
+    await navigateTo(cachedRoot);
+    showToast('Folder terakhir berhasil dimuat! 📂', 'info');
+  }
+}
+
+// Jalankan init explorer saat startup
+initExplorerCache();

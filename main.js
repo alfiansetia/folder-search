@@ -157,3 +157,14 @@ ipcMain.handle('shell:showInExplorer', async (_, filePath) => {
 // ─── Get System Info ──────────────────────────────────────────────────────────
 ipcMain.handle('os:homeDir', () => os.homedir());
 ipcMain.handle('os:platform', () => process.platform);
+
+// ─── Proxy Fetch (Fix CORS) ──────────────────────────────────────────────────
+ipcMain.handle('api:fetch', async (_, url) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+    return await response.json();
+  } catch (err) {
+    return { error: err.message };
+  }
+});

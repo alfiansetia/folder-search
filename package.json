@@ -1,6 +1,6 @@
 {
   "name": "folderscope",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Desktop File Manager — Jelajahi dan cari file/folder dengan tampilan modern",
   "main": "main.js",
   "scripts": {

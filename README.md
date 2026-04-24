@@ -1,39 +1,37 @@
-# 🗂️ FolderScope — Desktop File Manager
+# 🗂️ FolderScope — Desktop Manager & Spreadsheet API
 
-**FolderScope** adalah aplikasi desktop modern berbasis Electron.js yang dirancang untuk menjelajahi, menyaring, dan mencari file atau folder pada direktori target yang telah ditentukan. Aplikasi ini menawarkan antarmuka yang elegan dengan performa yang cepat dan fitur pencarian rekursif yang kuat.
+**FolderScope** adalah aplikasi desktop modern berbasis Electron.js yang dirancang untuk manajemen file lokal dan pengolahan data API Spreadsheet. Aplikasi ini menawarkan antarmuka premium, performa cepat, dan fitur persistensi data yang kuat.
 
 ![App Icon](assets/icon.png)
 
-## ✨ Fitur Utama
-- **Modern UI/UX:** Tampilan gelap (Dark Mode) premium dengan animasi halus dan *glassmorphism*.
-- **Explorer Mode:** Menjelajahi folder lokal dengan tampilan Grid atau List.
-- **Search Engine:** Pencarian cepat hingga ke sub-direktori (rekursif) dengan opsi *Case Sensitive* dan *Exact Match*.
-- **Smart Filtering:** Filter file berdasarkan kategori (Gambar, Video, Kode, Dokumen, Arsip).
-- **File Stats:** Ringkasan jumlah folder, file, dan total ukuran kapasitas secara real-time.
-- **Shortcut Support:** Navigasi cepat dengan tombol keyboard (e.g., Backspace untuk naik folder, F5 refresh).
+## ✨ Fitur Utama (v1.1.0)
+- **Explorer Mode:** Menjelajahi folder lokal dengan tampilan Grid atau List yang elegan.
+- **Search Engine:** Pencarian file rekursif yang cepat dengan opsi *Case Sensitive* dan *Exact Match*.
+- **Spreadsheet API (New):** Menarik data langsung dari JSON API ke dalam tabel spreadsheet yang interaktif.
+- **Smart Filtering:** 
+  - Filter file berdasarkan kategori (Gambar, Video, Kode, Dokumen, Arsip).
+  - Filter status data spreadsheet (Lengkap / Tidak Lengkap) berdasarkan validasi parameter P, L, T, dan B.
+- **Local Persistence:** Aplikasi mengingat folder terakhir yang Anda pilih dan melakukan caching pada data spreadsheet API sehingga data tetap tersedia saat aplikasi dibuka kembali.
+- **Modern UI/UX:** Tampilan gelap (Dark Mode) premium dengan animasi halus dan *Auto-hide Toolbar* yang cerdas.
 
 ## 🚀 Instalasi (Development)
 
-Jika Anda ingin menjalankan aplikasi ini dari kode sumber di lingkungan pengembangan:
+Jika Anda ingin menjalankan aplikasi ini dari kode sumber:
 
 1.  **Prasyarat:** Pastikan [Node.js](https://nodejs.org/) sudah terinstal di komputer Anda.
-2.  **Clone Repository:**
-    ```bash
-    git clone https://github.com/username/folder-search.git
-    cd folder-search
-    ```
-3.  **Install Dependensi:**
+2.  **Install Dependensi:**
     ```bash
     npm install
     ```
-4.  **Jalankan Aplikasi:**
+3.  **Jalankan Aplikasi:**
     ```bash
-    npm start
+    npm run dev
     ```
+    *(Gunakan `npm run dev` untuk mengaktifkan fitur debugging).*
 
 ## 📦 Build Menjadi Aplikasi (.exe)
 
-Untuk mengompilasi kode ini menjadi aplikasi siap pakai yang bisa dijalankan di komputer lain tanpa perlu Node.js:
+Untuk mengompilasi kode ini menjadi aplikasi siap pakai (.exe):
 
 1.  **Build Installer (NSIS):**
     Menghasilkan file `.exe` setup yang bisa diinstal di komputer lain.
@@ -41,15 +39,13 @@ Untuk mengompilasi kode ini menjadi aplikasi siap pakai yang bisa dijalankan di 
     npm run build:installer
     ```
 2.  **Build Portable version:**
-    Menghasilkan satu file `.exe` mandiri yang bisa langsung dijalankan tanpa instalasi.
+    Menghasilkan satu file `.exe` mandiri (Tanpa Install).
     ```bash
     npm run build:portable
     ```
-3.  **Output:**
-    Cek folder `dist/` setelah proses build selesai.
 
 ## 🛠️ Tech Stack
-- **Core:** Core JavaScript, HTML5, CSS3 (Vanilla).
+- **Core:** JavaScript (ES6+), HTML5, CSS3 (Vanilla).
 - **Framework:** [Electron.js](https://www.electronjs.org/)
 - **Build Tool:** [electron-builder](https://www.electron.build/)
 
@@ -57,4 +53,4 @@ Untuk mengompilasi kode ini menjadi aplikasi siap pakai yang bisa dijalankan di 
 Distribusi di bawah lisensi ISC.
 
 ---
-Dibuat dengan ❤️ untuk manajemen file yang lebih mudah.
+Dibuat dengan ❤️ untuk efisiensi kerja yang lebih baik.
