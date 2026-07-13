@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   FolderScope v1.2.0 — Custom Styles (Bootstrap 5 compatible)
+   FolderScope Custom Styles (Bootstrap 5 compatible)
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* ─── CSS Variables ──────────────────────────────────────────────────────── */
@@ -48,6 +48,9 @@ body {
   color: var(--text-primary);
   user-select: none;
   -webkit-font-smoothing: antialiased;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 /* Bootstrap form controls dark theme */
@@ -586,6 +589,7 @@ body {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   position: relative;
   z-index: 1;
@@ -758,6 +762,145 @@ body {
 }
 .toast.error {
   border-color: var(--red);
+}
+
+/* ─── Smooth Theme Transition ────────────────────────────────────────────── */
+.titlebar,
+.sidebar-menu,
+.tool-panel,
+.content-toolbar,
+.file-card,
+.target-card,
+.main-content,
+.table tbody td,
+.ss-table-container,
+.ss-table th,
+.ss-table td,
+.form-control,
+.form-select,
+.input-group-text,
+.dropdown-menu,
+.toast,
+.btn-icon,
+.btn-chip,
+.list-action-btn {
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* ─── Light Theme ────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-base: #f3f4f8;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f0f1f5;
+  --bg-hover: #e5e7ee;
+  --bg-active: #d8dae3;
+  --border: rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.13);
+  --accent: #5856d6;
+  --accent-light: #4f4dd0;
+  --accent-dim: rgba(88, 86, 214, 0.1);
+  --accent-glow: rgba(88, 86, 214, 0.2);
+  --text-primary: #1c1e28;
+  --text-secondary: #5a5e78;
+  --text-muted: #9498b0;
+}
+
+[data-theme="light"] .titlebar {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .sidebar-menu {
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .tool-panel {
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .content-toolbar {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .wc-btn:hover {
+  background: var(--bg-hover);
+}
+[data-theme="light"] .wc-close:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+[data-theme="light"] .file-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .file-card:hover {
+  background: var(--bg-elevated);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .file-card-icon {
+  filter: none;
+}
+[data-theme="light"] .ss-table-container {
+  background: #ffffff;
+}
+[data-theme="light"] .ss-table th {
+  background: var(--bg-elevated);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .ss-table tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.015);
+}
+[data-theme="light"] .target-card {
+  background: var(--bg-elevated);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .target-card.has-target {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+[data-theme="light"] .kbd-sm {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-secondary);
+}
+[data-theme="light"] .toast {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+}
+[data-theme="light"] .dropdown-menu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .dropdown-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+[data-theme="light"] .btn-chip {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+}
+[data-theme="light"] .btn-chip.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+[data-theme="light"] .btn-icon {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+}
+[data-theme="light"] .list-action-btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+}
+[data-theme="light"] .empty-icon-wrap {
+  filter: drop-shadow(0 0 30px rgba(88, 86, 214, 0.15));
 }
 
 /* ─── Animations ─────────────────────────────────────────────────────────── */

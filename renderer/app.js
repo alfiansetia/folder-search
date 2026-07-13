@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   FolderScope v1.2.0 — App Logic (Bootstrap 5 compatible)
+   FolderScope — App Logic (Bootstrap 5 compatible)
    ════════════════════════════════════════════════════════════════════════════ */
 
 "use strict";
@@ -971,6 +971,25 @@ document.addEventListener("keydown", (e) => {
     } catch (_) {}
   }
 })();
+
+// ─── Theme Toggle ──────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const icon = document.getElementById("theme-icon");
+  if (icon) {
+    icon.className =
+      theme === "light" ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+  }
+  localStorage.setItem("app-theme", theme);
+}
+
+const savedTheme = localStorage.getItem("app-theme") || "dark";
+applyTheme(savedTheme);
+
+document.getElementById("btn-theme").addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  applyTheme(current === "dark" ? "light" : "dark");
+});
 
 // ─── Init ───────────────────────────────────────────────────────────────────
 async function init() {
