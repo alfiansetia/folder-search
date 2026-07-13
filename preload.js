@@ -1,27 +1,29 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld("electronAPI", {
+  version: () => ipcRenderer.invoke("app:version"),
   // Window controls
-  minimize: () => ipcRenderer.send('window-minimize'),
-  maximize: () => ipcRenderer.send('window-maximize'),
-  close: () => ipcRenderer.send('window-close'),
+  minimize: () => ipcRenderer.send("window-minimize"),
+  maximize: () => ipcRenderer.send("window-maximize"),
+  close: () => ipcRenderer.send("window-close"),
 
   // Dialog
-  openFolder: () => ipcRenderer.invoke('dialog:openFolder'),
+  openFolder: () => ipcRenderer.invoke("dialog:openFolder"),
 
   // Filesystem
-  readDir: (dirPath) => ipcRenderer.invoke('fs:readDir', dirPath),
+  readDir: (dirPath) => ipcRenderer.invoke("fs:readDir", dirPath),
   search: (rootPath, query, options) =>
-    ipcRenderer.invoke('fs:search', { rootPath, query, options }),
+    ipcRenderer.invoke("fs:search", { rootPath, query, options }),
 
   // Shell
-  openPath: (filePath) => ipcRenderer.invoke('shell:openPath', filePath),
-  showInExplorer: (filePath) => ipcRenderer.invoke('shell:showInExplorer', filePath),
+  openPath: (filePath) => ipcRenderer.invoke("shell:openPath", filePath),
+  showInExplorer: (filePath) =>
+    ipcRenderer.invoke("shell:showInExplorer", filePath),
 
   // OS
-  homeDir: () => ipcRenderer.invoke('os:homeDir'),
-  platform: () => ipcRenderer.invoke('os:platform'),
+  homeDir: () => ipcRenderer.invoke("os:homeDir"),
+  platform: () => ipcRenderer.invoke("os:platform"),
 
   // API Proxy
-  fetchData: (url) => ipcRenderer.invoke('api:fetch', url),
+  fetchData: (url) => ipcRenderer.invoke("api:fetch", url),
 });

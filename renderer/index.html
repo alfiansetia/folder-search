@@ -1,358 +1,506 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FolderScope — File Manager</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-<!-- ─── Title Bar ─────────────────────────────────────────────────────────── -->
-<div class="titlebar" id="titlebar">
-  <div class="titlebar-left">
-    <div class="app-logo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M3 7C3 5.9 3.9 5 5 5H9.6C10.1 5 10.6 5.2 10.9 5.6L12 7H19C20.1 7 21 7.9 21 9V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V7Z" fill="url(#folderGrad)" stroke="none"/>
-        <defs>
-          <linearGradient id="folderGrad" x1="3" y1="5" x2="21" y2="20" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6366f1"/>
-            <stop offset="1" stop-color="#8b5cf6"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-    <span class="app-name">FolderScope</span>
-    <span class="app-version">v1.1</span>
-  </div>
-  <div class="titlebar-drag" id="titlebar-drag"></div>
-  <div class="titlebar-controls">
-    <button class="wc-btn wc-min" id="btn-min" title="Minimize">
-      <svg width="10" height="2" viewBox="0 0 10 2"><rect width="10" height="2" fill="currentColor"/></svg>
-    </button>
-    <button class="wc-btn wc-max" id="btn-max" title="Maximize">
-      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-    </button>
-    <button class="wc-btn wc-close" id="btn-close" title="Close">
-      <svg width="10" height="10" viewBox="0 0 10 10">
-        <line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.5"/>
-        <line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
-    </button>
-  </div>
-</div>
-
-<!-- ─── Main Layout ───────────────────────────────────────────────────────── -->
-<div class="app-layout">
-
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">TARGET FOLDER</div>
-      <div class="target-folder-card" id="target-card">
-        <div class="target-folder-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M3 7C3 5.9 3.9 5 5 5H9.6C10.1 5 10.6 5.2 10.9 5.6L12 7H19C20.1 7 21 7.9 21 9V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V7Z" fill="url(#sg1)"/>
-            <defs><linearGradient id="sg1" x1="3" y1="5" x2="21" y2="20"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FolderScope — File Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ════════════════════════════════════════════════════════════════════════════
+     TITLEBAR
+     ════════════════════════════════════════════════════════════════════════════ -->
+    <div class="titlebar d-flex align-items-center px-3" id="titlebar">
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <div class="app-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M3 7C3 5.9 3.9 5 5 5H9.6C10.1 5 10.6 5.2 10.9 5.6L12 7H19C20.1 7 21 7.9 21 9V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V7Z"
+              fill="url(#folderGrad)"
+              stroke="none"
+            />
+            <defs>
+              <linearGradient id="folderGrad" x1="3" y1="5" x2="21" y2="20">
+                <stop stop-color="#6366f1" />
+                <stop offset="1" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div class="target-folder-info">
-          <span class="target-folder-name" id="target-name">Belum dipilih</span>
-          <span class="target-folder-path" id="target-path">Klik tombol di bawah</span>
+        <span class="app-name">FolderScope</span>
+        <span class="app-version">v...</span>
+      </div>
+      <div class="flex-grow-1 titlebar-drag" id="titlebar-drag"></div>
+      <div class="d-flex align-items-center gap-1 flex-shrink-0">
+        <button class="wc-btn" id="btn-min" title="Minimize">
+          <i class="bi bi-dash"></i>
+        </button>
+        <button class="wc-btn" id="btn-max" title="Maximize">
+          <i class="bi bi-square"></i>
+        </button>
+        <button class="wc-btn wc-close" id="btn-close" title="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════════════
+     MAIN LAYOUT: Sidebar (icon menu) → Tool Panel → Content
+     ════════════════════════════════════════════════════════════════════════════ -->
+    <div class="app-layout d-flex" style="height: calc(100vh - 38px)">
+      <!-- ─── Col 1: Sidebar Menu (narrow icon bar) ─────────────────────────────── -->
+      <aside
+        class="sidebar-menu d-flex flex-column align-items-center py-3"
+        id="sidebar-menu"
+      >
+        <!-- App Nav -->
+        <button
+          class="sidebar-icon-btn active"
+          id="nav-explorer"
+          title="File Explorer (⌘1)"
+        >
+          <i class="bi bi-folder2-open"></i>
+        </button>
+        <button
+          class="sidebar-icon-btn"
+          id="nav-spreadsheet"
+          title="Spreadsheet API (⌘2)"
+        >
+          <i class="bi bi-table"></i>
+        </button>
+
+        <div class="mt-auto d-flex flex-column align-items-center gap-1">
+          <button
+            class="sidebar-icon-btn"
+            id="btn-settings"
+            title="Pengaturan"
+            style="display: none"
+          >
+            <i class="bi bi-gear"></i>
+          </button>
         </div>
-      </div>
-      <button class="btn-pick-folder" id="btn-pick-folder">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-          <line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>
-        </svg>
-        Pilih Folder
-      </button>
-    </div>
+      </aside>
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">PENCARIAN</div>
-      <div class="search-box">
-        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" id="search-input" placeholder="Cari file / folder..." class="search-input" />
-        <button class="search-clear" id="search-clear" title="Clear">×</button>
-      </div>
-      <div class="search-options">
-        <label class="opt-check">
-          <input type="checkbox" id="opt-recursive" checked />
-          <span class="checkmark"></span>
-          Rekursif (subdirektori)
-        </label>
-        <label class="opt-check">
-          <input type="checkbox" id="opt-case-sensitive" />
-          <span class="checkmark"></span>
-          Case Sensitive
-        </label>
-        <label class="opt-check">
-          <input type="checkbox" id="opt-exact-match" />
-          <span class="checkmark"></span>
-          Exact Match
-        </label>
-      </div>
-      <button class="btn-search" id="btn-search" disabled>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        Mulai Pencarian
-      </button>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">NAVIGASI</div>
-      <div class="nav-menu">
-        <button class="nav-btn active" id="nav-explorer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-             <path d="M3 7C3 5.9 3.9 5 5 5H9.6C10.1 5 10.6 5.2 10.9 5.6L12 7H19C20.1 7 21 7.9 21 9V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V7Z"/>
-          </svg>
-          File Explorer
-        </button>
-        <button class="nav-btn" id="nav-spreadsheet">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <line x1="3" y1="9" x2="21" y2="9"/>
-            <line x1="3" y1="15" x2="21" y2="15"/>
-            <line x1="9" y1="3" x2="9" y2="21"/>
-            <line x1="15" y1="3" x2="15" y2="21"/>
-          </svg>
-          Spreadsheet API
-        </button>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">FILTER TIPE</div>
-      <div class="filter-chips" id="filter-chips">
-        <button class="chip active" data-filter="all">Semua</button>
-        <button class="chip" data-filter="folder">Folder</button>
-        <button class="chip" data-filter="image">Gambar</button>
-        <button class="chip" data-filter="doc">Dokumen</button>
-        <button class="chip" data-filter="video">Video</button>
-        <button class="chip" data-filter="code">Kode</button>
-        <button class="chip" data-filter="archive">Arsip</button>
-      </div>
-    </div>
-
-    <div class="sidebar-stats" id="sidebar-stats" style="display:none">
-      <div class="stat-item">
-        <span class="stat-value" id="stat-folders">0</span>
-        <span class="stat-label">Folder</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-value" id="stat-files">0</span>
-        <span class="stat-label">File</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-value" id="stat-size">0</span>
-        <span class="stat-label">Total</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main-content">
-
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <div class="breadcrumb" id="breadcrumb">
-        <span class="breadcrumb-home">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-          </svg>
-        </span>
-        <span class="breadcrumb-item" id="bc-root">FolderScope</span>
-      </div>
-      <div class="toolbar-actions">
-        <button class="tool-btn" id="btn-up" title="Naik ke folder induk" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M12 19V5M5 12l7-7 7 7"/>
-          </svg>
-        </button>
-        <button class="tool-btn" id="btn-refresh" title="Refresh" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M1 4v6h6M23 20v-6h-6"/>
-            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
-          </svg>
-        </button>
-        <div class="tool-divider"></div>
-        <button class="tool-btn active" id="btn-view-grid" title="Grid View">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-          </svg>
-        </button>
-        <button class="tool-btn" id="btn-view-list" title="List View">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-            <line x1="8" y1="18" x2="21" y2="18"/>
-            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
-            <line x1="3" y1="18" x2="3.01" y2="18"/>
-          </svg>
-        </button>
-        <div class="tool-divider"></div>
-        <div class="sort-select-wrap">
-          <select id="sort-select" class="sort-select">
-            <option value="name-asc">Nama ↑</option>
-            <option value="name-desc">Nama ↓</option>
-            <option value="size-asc">Ukuran ↑</option>
-            <option value="size-desc">Ukuran ↓</option>
-            <option value="date-asc">Tanggal ↑</option>
-            <option value="date-desc">Tanggal ↓</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Content Area -->
-    <div class="content-area" id="content-area">
-
-      <!-- Empty State -->
-      <div class="empty-state" id="empty-state">
-        <div class="empty-icon">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-            <path d="M3 7C3 5.9 3.9 5 5 5H9.6C10.1 5 10.6 5.2 10.9 5.6L12 7H19C20.1 7 21 7.9 21 9V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V7Z" fill="url(#es1)" opacity="0.3"/>
-            <defs><linearGradient id="es1" x1="3" y1="5" x2="21" y2="20"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
-          </svg>
-        </div>
-        <h2 class="empty-title">Pilih Folder Target</h2>
-        <p class="empty-desc">Klik <strong>Pilih Folder</strong> di panel kiri untuk mulai menjelajahi file dan folder.</p>
-        <button class="btn-pick-folder-big" id="btn-pick-folder-big">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-          </svg>
-          Pilih Folder Sekarang
-        </button>
-      </div>
-
-      <!-- Loading -->
-      <div class="loading-state" id="loading-state" style="display:none">
-        <div class="spinner"></div>
-        <p>Memuat isi folder...</p>
-      </div>
-
-      <!-- File Grid -->
-      <div class="file-grid" id="file-grid" style="display:none"></div>
-
-      <!-- File List -->
-      <div class="file-list-wrap" id="file-list-wrap" style="display:none">
-        <table class="file-list">
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Tipe</th>
-              <th>Ukuran</th>
-              <th>Dimodifikasi</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="file-list-body"></tbody>
-        </table>
-      </div>
-
-      <!-- Search Results -->
-      <div class="search-results-header" id="search-header" style="display:none">
-        <div class="sr-info">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          Hasil pencarian: <strong id="sr-query"></strong>
-          <span class="sr-count" id="sr-count">0 hasil</span>
-        </div>
-        <button class="sr-back" id="sr-back">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
-          Kembali ke Explorer
-        </button>
-      </div>
-
-      <!-- Spreadsheet View -->
-      <div class="spreadsheet-view" id="spreadsheet-view" style="display:none">
-        <div class="ss-header">
-          <div class="ss-title-wrap">
-            <h2 class="ss-title">Spreadsheet & API</h2>
-            <p class="ss-subtitle">Fetch data dari JSON API atau Spreadsheet</p>
+      <!-- ─── Col 2: Tool Panel (context-sensitive) ─────────────────────────────── -->
+      <div class="tool-panel d-flex flex-column" id="tool-panel">
+        <!-- ── Explorer Tools ────────────────────────────────────────────────────── -->
+        <div
+          class="tool-panel-content flex-grow-1 overflow-auto"
+          id="explorer-tools"
+        >
+          <!-- Target Folder Info -->
+          <div class="tp-section">
+            <div class="tp-label">
+              <i class="bi bi-bullseye me-1"></i>Target Folder
+            </div>
+            <div class="target-card p-2 rounded" id="target-card">
+              <div class="d-flex align-items-center gap-2">
+                <i
+                  class="bi bi-folder-fill fs-4"
+                  style="color: var(--accent)"
+                ></i>
+                <div class="overflow-hidden flex-grow-1">
+                  <div class="fw-semibold text-truncate small" id="target-name">
+                    Belum dipilih
+                  </div>
+                  <div
+                    class="text-muted text-truncate"
+                    id="target-path"
+                    style="
+                      font-size: 10px;
+                      font-family: &quot;JetBrains Mono&quot;, monospace;
+                    "
+                  >
+                    Klik tombol di bawah
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              class="btn btn-outline-primary btn-sm w-100 mt-2"
+              id="btn-pick-folder-2"
+            >
+              <i class="bi bi-folder2-open me-1"></i>Pilih Folder
+            </button>
           </div>
-          <div class="ss-actions">
-            <div class="ss-input-group">
-              <input type="text" id="ss-api-url" placeholder="Masukkan URL API JSON di sini..." class="ss-input" />
-              <button class="btn-fetch" id="btn-fetch-api">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                Fetch
+
+          <hr class="tp-divider" />
+
+          <!-- Search -->
+          <div class="tp-section">
+            <div class="tp-label">
+              <i class="bi bi-search me-1"></i>Pencarian
+            </div>
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input
+                type="text"
+                id="search-input"
+                class="form-control"
+                placeholder="Cari file / folder..."
+              />
+              <button
+                class="btn btn-outline-secondary"
+                id="search-clear"
+                title="Clear"
+                style="display: none"
+              >
+                <i class="bi bi-x"></i>
               </button>
             </div>
-            <div class="ss-divider"></div>
-            <div class="ss-search-box">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-              <input type="text" id="ss-search-input" placeholder="Cari di tabel..." class="ss-search-input" />
+            <div class="d-flex flex-column gap-1 mb-2">
+              <div class="form-check form-check-sm">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="opt-recursive"
+                  checked
+                />
+                <label class="form-check-label" for="opt-recursive"
+                  >Rekursif (subdirektori)</label
+                >
+              </div>
+              <div class="form-check form-check-sm">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="opt-case-sensitive"
+                />
+                <label class="form-check-label" for="opt-case-sensitive"
+                  >Case Sensitive</label
+                >
+              </div>
+              <div class="form-check form-check-sm">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="opt-exact-match"
+                />
+                <label class="form-check-label" for="opt-exact-match"
+                  >Exact Match</label
+                >
+              </div>
             </div>
-            <div class="ss-divider"></div>
-            <div class="ss-filter-wrap">
-              <select id="ss-status-filter" class="ss-select">
-                <option value="all">Semua Status</option>
-                <option value="complete">Lengkap ✅</option>
-                <option value="incomplete">Tidak Lengkap ❌</option>
-              </select>
+            <button
+              class="btn btn-primary btn-sm w-100"
+              id="btn-search"
+              disabled
+            >
+              <i class="bi bi-search me-1"></i>Mulai Pencarian
+            </button>
+          </div>
+
+          <hr class="tp-divider" />
+
+          <!-- Filter Tipe -->
+          <div class="tp-section">
+            <div class="tp-label">
+              <i class="bi bi-funnel me-1"></i>Filter Tipe
             </div>
+            <div class="d-flex flex-wrap gap-1" id="filter-chips">
+              <button class="btn btn-sm btn-chip active" data-filter="all">
+                Semua
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="folder">
+                <i class="bi bi-folder me-1"></i>Folder
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="image">
+                <i class="bi bi-image me-1"></i>Gambar
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="doc">
+                <i class="bi bi-file-earmark me-1"></i>Dokumen
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="video">
+                <i class="bi bi-camera-video me-1"></i>Video
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="code">
+                <i class="bi bi-code-slash me-1"></i>Kode
+              </button>
+              <button class="btn btn-sm btn-chip" data-filter="archive">
+                <i class="bi bi-archive me-1"></i>Arsip
+              </button>
+            </div>
+          </div>
+
+          <hr class="tp-divider" />
+
+          <!-- View & Sort -->
+          <div class="tp-section">
+            <div class="tp-label"><i class="bi bi-eye me-1"></i>Tampilan</div>
+            <div class="btn-group btn-group-sm w-100 mb-2" role="group">
+              <button
+                type="button"
+                class="btn btn-outline-secondary active"
+                id="btn-view-grid"
+                title="Grid View"
+              >
+                <i class="bi bi-grid-3x3-gap"></i> Grid
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                id="btn-view-list"
+                title="List View"
+              >
+                <i class="bi bi-list-ul"></i> List
+              </button>
+            </div>
+            <select id="sort-select" class="form-select form-select-sm">
+              <option value="name-asc">Nama A → Z</option>
+              <option value="name-desc">Nama Z → A</option>
+              <option value="size-asc">Ukuran ↑</option>
+              <option value="size-desc">Ukuran ↓</option>
+              <option value="date-asc">Terlama</option>
+              <option value="date-desc">Terbaru</option>
+            </select>
           </div>
         </div>
 
-        <div class="ss-content">
-          <div class="ss-table-container" id="ss-table-container">
-            <div class="ss-empty">
-              <div class="ss-empty-icon">📊</div>
-              <h3>Waktunya Fetch Data!</h3>
-              <p>Masukkan URL API (JSON) atau upload file Excel (.xlsx) untuk ditampilkan di sini.</p>
+        <!-- ── Spreadsheet Tools ─────────────────────────────────────────────────── -->
+        <div
+          class="tool-panel-content flex-grow-1 overflow-auto"
+          id="spreadsheet-tools"
+          style="display: none"
+        >
+          <div class="tp-section">
+            <div class="tp-label">
+              <i class="bi bi-link-45deg me-1"></i>API URL
             </div>
+            <div class="input-group input-group-sm mb-2">
+              <input
+                type="text"
+                id="ss-api-url"
+                class="form-control"
+                placeholder="https://api.example.com/data"
+              />
+              <button class="btn btn-primary" id="btn-fetch-api">
+                <i class="bi bi-cloud-download"></i>
+              </button>
+            </div>
+          </div>
+          <hr class="tp-divider" />
+          <div class="tp-section">
+            <div class="tp-label">
+              <i class="bi bi-search me-1"></i>Cari Data
+            </div>
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input
+                type="text"
+                id="ss-search-input"
+                class="form-control"
+                placeholder="Cari di tabel..."
+              />
+            </div>
+            <select id="ss-status-filter" class="form-select form-select-sm">
+              <option value="all">Semua Status</option>
+              <option value="complete">Lengkap ✅</option>
+              <option value="incomplete">Tidak Lengkap ❌</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ── Stats (bottom of tool panel) ──────────────────────────────────────── -->
+        <div class="tp-stats" id="sidebar-stats" style="display: none">
+          <div class="text-center">
+            <div class="fs-5 fw-bold text-primary" id="stat-folders">0</div>
+            <div class="text-muted" style="font-size: 10px">Folder</div>
+          </div>
+          <div class="vr p-0" style="opacity: 0.2"></div>
+          <div class="text-center">
+            <div class="fs-5 fw-bold text-primary" id="stat-files">0</div>
+            <div class="text-muted" style="font-size: 10px">File</div>
+          </div>
+          <div class="vr p-0" style="opacity: 0.2"></div>
+          <div class="text-center">
+            <div class="fs-5 fw-bold text-primary" id="stat-size">0</div>
+            <div class="text-muted" style="font-size: 10px">Total</div>
           </div>
         </div>
       </div>
 
+      <!-- ─── Col 3: Main Content ──────────────────────────────────────────────── -->
+      <main class="main-content d-flex flex-column flex-grow-1 overflow-hidden">
+        <!-- Toolbar (breadcrumb + nav) -->
+        <div
+          class="content-toolbar d-flex align-items-center px-3"
+          id="content-toolbar"
+        >
+          <div class="d-flex align-items-center gap-2 me-auto overflow-hidden">
+            <button
+              class="btn btn-sm btn-icon"
+              id="btn-up"
+              title="Naik ke folder induk"
+              disabled
+            >
+              <i class="bi bi-arrow-up"></i>
+            </button>
+            <button
+              class="btn btn-sm btn-icon"
+              id="btn-refresh"
+              title="Refresh (F5)"
+              disabled
+            >
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <div class="vr mx-1" style="opacity: 0.2; height: 18px"></div>
+            <nav
+              class="breadcrumb-nav d-flex align-items-center gap-1 overflow-hidden"
+              id="breadcrumb"
+            >
+              <span class="bc-home"><i class="bi bi-house-door"></i></span>
+              <span class="bc-sep"><i class="bi bi-chevron-right"></i></span>
+              <span class="bc-item current" id="bc-root">FolderScope</span>
+            </nav>
+          </div>
+          <!-- Search Results Info -->
+          <div class="d-none align-items-center gap-2" id="search-header">
+            <span class="badge bg-primary rounded-pill" id="sr-count"
+              >0 hasil</span
+            >
+            <span class="small text-muted"
+              >Hasil: <strong class="text-primary" id="sr-query"></strong
+            ></span>
+            <button class="btn btn-sm btn-outline-secondary" id="sr-back">
+              <i class="bi bi-arrow-left me-1"></i>Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div
+          class="content-area flex-grow-1 overflow-auto p-3"
+          id="content-area"
+        >
+          <!-- Empty State -->
+          <div
+            class="d-flex flex-column align-items-center justify-content-center h-100 gap-3"
+            id="empty-state"
+          >
+            <div class="empty-icon-wrap">
+              <i
+                class="bi bi-folder2-open"
+                style="font-size: 64px; color: var(--accent); opacity: 0.4"
+              ></i>
+            </div>
+            <h4 class="fw-bold">Pilih Folder Target</h4>
+            <p class="text-muted text-center" style="max-width: 340px">
+              Klik <strong class="text-primary">Pilih Folder</strong> di panel
+              kiri untuk mulai menjelajahi file dan folder.
+            </p>
+            <button class="btn btn-primary" id="btn-pick-folder-big">
+              <i class="bi bi-folder2-open me-2"></i>Pilih Folder Sekarang
+            </button>
+            <div class="d-flex gap-3 text-muted mt-2" style="font-size: 11px">
+              <span
+                ><kbd class="kbd-sm">Ctrl</kbd>+<kbd class="kbd-sm">O</kbd>
+                Buka</span
+              >
+              <span
+                ><kbd class="kbd-sm">Ctrl</kbd>+<kbd class="kbd-sm">F</kbd>
+                Cari</span
+              >
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div
+            class="d-none flex-column align-items-center justify-content-center h-100 gap-3"
+            id="loading-state"
+          >
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted">Memuat isi folder...</p>
+          </div>
+
+          <!-- File Grid -->
+          <div class="row g-2" id="file-grid" style="display: none"></div>
+
+          <!-- File List -->
+          <div id="file-list-wrap" style="display: none">
+            <table class="table table-hover file-table mb-0">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th style="width: 100px">Tipe</th>
+                  <th style="width: 90px">Ukuran</th>
+                  <th style="width: 150px">Dimodifikasi</th>
+                  <th style="width: 110px">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="file-list-body"></tbody>
+            </table>
+          </div>
+
+          <!-- Spreadsheet View -->
+          <div id="spreadsheet-view" style="display: none; height: 100%">
+            <div
+              class="ss-table-container h-100 overflow-auto rounded border"
+              id="ss-table-container"
+            >
+              <div
+                class="d-flex flex-column align-items-center justify-content-center h-100 gap-3 text-muted p-4"
+              >
+                <i
+                  class="bi bi-bar-chart-line"
+                  style="font-size: 48px; opacity: 0.3"
+                ></i>
+                <h5>Waktunya Fetch Data!</h5>
+                <p class="text-center" style="max-width: 300px">
+                  Masukkan URL API (JSON) di panel kiri untuk menampilkan data
+                  di sini.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-  </main>
 
-</div>
+    <!-- ─── Context Menu ───────────────────────────────────────────────────────── -->
+    <div
+      class="dropdown-menu shadow"
+      id="context-menu"
+      style="display: none; position: fixed; z-index: 9999"
+    >
+      <button
+        class="dropdown-item d-flex align-items-center gap-2"
+        id="ctx-open"
+      >
+        <i class="bi bi-box-arrow-up-right"></i> Buka
+      </button>
+      <button
+        class="dropdown-item d-flex align-items-center gap-2"
+        id="ctx-explorer"
+      >
+        <i class="bi bi-display"></i> Tampilkan di Explorer
+      </button>
+      <hr class="dropdown-divider" />
+      <button
+        class="dropdown-item d-flex align-items-center gap-2"
+        id="ctx-copy-path"
+      >
+        <i class="bi bi-clipboard"></i> Salin Path
+      </button>
+    </div>
 
-<!-- ─── Context Menu ───────────────────────────────────────────────────────── -->
-<div class="context-menu" id="context-menu" style="display:none">
-  <button class="ctx-item" id="ctx-open">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-      <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-    </svg>
-    Buka
-  </button>
-  <button class="ctx-item" id="ctx-explorer">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-    </svg>
-    Tampilkan di Explorer
-  </button>
-  <div class="ctx-divider"></div>
-  <button class="ctx-item" id="ctx-copy-path">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-    </svg>
-    Salin Path
-  </button>
-</div>
+    <!-- ─── Toast Container ────────────────────────────────────────────────────── -->
+    <div
+      class="toast-container position-fixed bottom-0 end-0 p-3"
+      id="toast-container"
+      style="z-index: 99999"
+    ></div>
 
-<!-- ─── Toast ──────────────────────────────────────────────────────────────── -->
-<div class="toast-container" id="toast-container"></div>
-
-<script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>

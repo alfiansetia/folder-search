@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+const path = require("path");
+const fs = require("fs");
+const os = require("os");
+const pkg = require("./package.json");
 
 let mainWindow;
 
@@ -13,59 +14,59 @@ function createWindow() {
     minHeight: 600,
     frame: false,
     transparent: false,
-    backgroundColor: '#0f1117',
+    backgroundColor: "#0f1117",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
     },
-    icon: path.join(__dirname, 'assets', 'icon.png'),
+    icon: path.join(__dirname, "assets", "icon.png"),
     show: false,
   });
 
-  mainWindow.loadFile('renderer/index.html');
+  mainWindow.loadFile("renderer/index.html");
 
-  mainWindow.once('ready-to-show', () => {
+  mainWindow.once("ready-to-show", () => {
     mainWindow.show();
   });
 }
 
 app.whenReady().then(() => {
   createWindow();
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
 // ─── Window Controls ──────────────────────────────────────────────────────────
-ipcMain.on('window-minimize', () => mainWindow.minimize());
-ipcMain.on('window-maximize', () => {
+ipcMain.on("window-minimize", () => mainWindow.minimize());
+ipcMain.on("window-maximize", () => {
   mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
 });
-ipcMain.on('window-close', () => mainWindow.close());
+ipcMain.on("window-close", () => mainWindow.close());
 
 // ─── Dialog: Pick Folder ──────────────────────────────────────────────────────
-ipcMain.handle('dialog:openFolder', async () => {
+ipcMain.handle("dialog:openFolder", async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    properties: ['openDirectory'],
-    title: 'Pilih Folder Target',
+    properties: ["openDirectory"],
+    title: "Pilih Folder Target",
   });
   return result.canceled ? null : result.filePaths[0];
 });
 
 // ─── Read Directory ───────────────────────────────────────────────────────────
-ipcMain.handle('fs:readDir', async (_, dirPath) => {
+ipcMain.handle("fs:readDir", async (_, dirPath) => {
   try {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
     return entries.map((entry) => {
       const fullPath = path.join(dirPath, entry.name);
       let size = 0;
       let modified = null;
-      let isHidden = entry.name.startsWith('.');
+      let isHidden = entry.name.startsWith(".");
 
       try {
         const stat = fs.statSync(fullPath);
@@ -80,7 +81,9 @@ ipcMain.handle('fs:readDir', async (_, dirPath) => {
         isHidden,
         size,
         modified,
-        ext: entry.isDirectory() ? null : path.extname(entry.name).toLowerCase(),
+        ext: entry.isDirectory()
+          ? null
+          : path.extname(entry.name).toLowerCase(),
       };
     });
   } catch (err) {
@@ -89,7 +92,7 @@ ipcMain.handle('fs:readDir', async (_, dirPath) => {
 });
 
 // ─── Search Files Recursively ─────────────────────────────────────────────────
-ipcMain.handle('fs:search', async (_, { rootPath, query, options }) => {
+ipcMain.handle("fs:search", async (_, { rootPath, query, options }) => {
   const results = [];
   const maxResults = 500;
 
@@ -108,7 +111,9 @@ ipcMain.handle('fs:search', async (_, { rootPath, query, options }) => {
       if (results.length >= maxResults) break;
 
       const fullPath = path.join(dir, entry.name);
-      const nameToCheck = options.caseSensitive ? entry.name : entry.name.toLowerCase();
+      const nameToCheck = options.caseSensitive
+        ? entry.name
+        : entry.name.toLowerCase();
       const queryToCheck = options.caseSensitive ? query : query.toLowerCase();
 
       const match = options.exactMatch
@@ -131,7 +136,9 @@ ipcMain.handle('fs:search', async (_, { rootPath, query, options }) => {
           isDirectory: entry.isDirectory(),
           size,
           modified,
-          ext: entry.isDirectory() ? null : path.extname(entry.name).toLowerCase(),
+          ext: entry.isDirectory()
+            ? null
+            : path.extname(entry.name).toLowerCase(),
         });
       }
 
@@ -146,20 +153,20 @@ ipcMain.handle('fs:search', async (_, { rootPath, query, options }) => {
 });
 
 // ─── Open File/Folder in OS Explorer ─────────────────────────────────────────
-ipcMain.handle('shell:openPath', async (_, filePath) => {
+ipcMain.handle("shell:openPath", async (_, filePath) => {
   return shell.openPath(filePath);
 });
 
-ipcMain.handle('shell:showInExplorer', async (_, filePath) => {
+ipcMain.handle("shell:showInExplorer", async (_, filePath) => {
   shell.showItemInFolder(filePath);
 });
 
 // ─── Get System Info ──────────────────────────────────────────────────────────
-ipcMain.handle('os:homeDir', () => os.homedir());
-ipcMain.handle('os:platform', () => process.platform);
-
+ipcMain.handle("os:homeDir", () => os.homedir());
+ipcMain.handle("os:platform", () => process.platform);
+ipcMain.handle("app:version", () => pkg.version);
 // ─── Proxy Fetch (Fix CORS) ──────────────────────────────────────────────────
-ipcMain.handle('api:fetch', async (_, url) => {
+ipcMain.handle("api:fetch", async (_, url) => {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
