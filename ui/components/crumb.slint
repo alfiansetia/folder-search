@@ -1,0 +1,35 @@
+// Satu crumb breadcrumb (nama folder, bisa diklik kecuali posisi aktif).
+// Navigasi via callback window `nav-crumb(int)` dengan index crumb.
+import { Theme } from "../theme.slint";
+
+export component Crumb inherits Rectangle {
+    in property <string> label;
+    in property <bool> active: false;
+
+    callback clicked();
+
+    height: 26px;
+    border-radius: Theme.radius-sm;
+    background: root.active ? Theme.accent-dim : (touch.has-hover ? Theme.bg-hover : transparent);
+
+    HorizontalLayout {
+        padding-left: 8px;
+        padding-right: 8px;
+        VerticalLayout {
+            alignment: center;
+            Text {
+                text: root.label;
+                font-size: 12px;
+                font-weight: root.active ? 600 : 400;
+                color: root.active ? Theme.accent : Theme.text-secondary;
+                vertical-alignment: center;
+            }
+        }
+    }
+
+    touch := TouchArea {
+        enabled: !root.active;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}

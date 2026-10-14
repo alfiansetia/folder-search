@@ -1,0 +1,37 @@
+// Ikon tipe file + warna (dipakai FileRowItem list & FileCellItem grid).
+// Diekstrak agar rantai `if kind == "…"` (1:1 dengan ui/icons/) hanya ada
+// di satu tempat. `kind`+`tint` dihitung Rust (fs::file_kind).
+import { Theme } from "../theme.slint";
+
+export component FileTypeIcon inherits Rectangle {
+    in property <string> kind;
+    in property <color> tint;
+    in property <length> box-size: 36px;
+    in property <length> icon-size: 20px;
+
+    width: box-size;
+    height: box-size;
+    border-radius: 8px;
+
+    Rectangle {
+        border-radius: 8px;
+        background: root.tint;
+        opacity: 0.15;
+    }
+    HorizontalLayout {
+        alignment: center;
+        VerticalLayout {
+            alignment: center;
+            if root.kind == "folder": Image { source: @image-url("../icons/folder.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "image": Image { source: @image-url("../icons/image.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "video": Image { source: @image-url("../icons/video.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "audio": Image { source: @image-url("../icons/audio.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "doc": Image { source: @image-url("../icons/doc.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "code": Image { source: @image-url("../icons/code.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "archive": Image { source: @image-url("../icons/archive.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "exe": Image { source: @image-url("../icons/exe.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "font": Image { source: @image-url("../icons/font.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+            if root.kind == "file": Image { source: @image-url("../icons/file.svg"); width: root.icon-size; height: root.icon-size; colorize: root.tint; }
+        }
+    }
+}

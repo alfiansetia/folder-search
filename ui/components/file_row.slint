@@ -2,6 +2,7 @@
 // + tombol aksi ikon + garis pemisah. Lihat `.ai/UI.md`.
 import { Theme } from "../theme.slint";
 import { IconButton } from "icon_button.slint";
+import { FileTypeIcon } from "file_icon.slint";
 
 export struct FileRow {
     name: string,
@@ -10,6 +11,8 @@ export struct FileRow {
     is_dir: bool,
     kind: string,
     tint: color,
+    gcol: int,
+    grow: int,
 }
 
 export component FileRowItem inherits Rectangle {
@@ -23,12 +26,14 @@ export component FileRowItem inherits Rectangle {
 
     callback open-clicked(int);
     callback reveal-clicked(int);
+    callback row-clicked(int);
 
     background: touch.has-hover ? Theme.bg-hover : transparent;
     border-radius: Theme.radius-sm;
 
     touch := TouchArea {
         mouse-cursor: pointer;
+        clicked => { root.row-clicked(root.row-index); }
     }
 
     VerticalLayout {
@@ -42,31 +47,9 @@ export component FileRowItem inherits Rectangle {
             padding-left: 6px;
             padding-right: 6px;
 
-            Rectangle {
-                width: 36px;
-                height: 36px;
-                border-radius: 8px;
-                Rectangle {
-                    border-radius: 8px;
-                    background: row-tint;
-                    opacity: 0.15;
-                }
-                HorizontalLayout {
-                    alignment: center;
-                    VerticalLayout {
-                        alignment: center;
-                        if row-kind == "folder": Image { source: @image-url("../icons/folder.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "image": Image { source: @image-url("../icons/image.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "video": Image { source: @image-url("../icons/video.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "audio": Image { source: @image-url("../icons/audio.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "doc": Image { source: @image-url("../icons/doc.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "code": Image { source: @image-url("../icons/code.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "archive": Image { source: @image-url("../icons/archive.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "exe": Image { source: @image-url("../icons/exe.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "font": Image { source: @image-url("../icons/font.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                        if row-kind == "file": Image { source: @image-url("../icons/file.svg"); width: 20px; height: 20px; colorize: row-tint; }
-                    }
-                }
+            FileTypeIcon {
+                kind: root.row-kind;
+                tint: root.row-tint;
             }
 
             VerticalLayout {

@@ -26,6 +26,9 @@ tanpa Chromium. Binary ±10MB, RAM ±40-60MB.
   yang menelan klik).
 - Search explorer live saat mengetik (debounce 350ms) seperti filter
   sheet — tanpa perlu klik Cari/Enter.
+- Navigasi drill-down: klik baris/tile folder untuk masuk, breadcrumb
+  klik untuk naik level; search berjalan dari posisi saat ini.
+- Toggle tampilan explorer list/grid (tile 6 kolom + scroll).
 - Build rilis tanpa jendela konsol (GUI murni); debug tetap
   pakai konsol agar log terlihat.
 

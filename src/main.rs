@@ -22,8 +22,9 @@ mod spreadsheet;
 mod state;
 
 use fs::SearchOptions;
-use slint::{Color, ModelRc, VecModel};
+use slint::{Color, Model, ModelRc, SharedString, VecModel};
 use state::AppStore;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Instant;
@@ -65,12 +66,42 @@ fn apply_theme(w: &MainWindow, light: bool) {
     }
 }
 
-/// Baca folder target + sort + tampilkan (satu-satunya jalur listing explorer).
+/// Direktori yang sedang ditampilkan (bisa masuk ke subfolder).
+/// Fallback ke target bila belum pernah navigasi.
+fn current_dir(store: &AppStore) -> Option<PathBuf> {
+    store.get_current().or_else(|| store.get_target())
+}
+
+/// Nama folder untuk breadcrumb (file_name; root drive pakai full path).
+fn dir_display_name(p: &Path) -> String {
+    p.file_name()
+        .map(|s| s.to_string_lossy().to_string())
+        .unwrap_or_else(|| p.to_string_lossy().to_string())
+}
+
+/// Susun crumbs target → current untuk breadcrumb UI.
+fn refresh_crumbs(w: &MainWindow, store: &AppStore) {
+    let mut names: Vec<SharedString> = Vec::new();
+    if let Some(target) = store.get_target() {
+        names.push(dir_display_name(&target).into());
+        if let Some(cur) = store.get_current() {
+            if let Ok(rel) = cur.strip_prefix(&target) {
+                for comp in rel.components() {
+                    names.push(comp.as_os_str().to_string_lossy().to_string().into());
+                }
+            }
+        }
+    }
+    w.set_crumbs(ModelRc::new(VecModel::from(names)));
+}
+
+/// Baca folder saat ini + sort + tampilkan (satu-satunya jalur listing explorer).
 fn show_dir_listing(w: &MainWindow, store: &AppStore) {
-    let Some(dir) = store.get_target() else {
+    let Some(dir) = current_dir(store) else {
         w.set_status_text("Pilih folder target dulu.".into());
         return;
     };
+    refresh_crumbs(w, store);
     match fs::read_dir_entries(&dir) {
         Ok(mut entries) => {
             fs::sort_entries(&mut entries, &w.get_sort_mode());
@@ -82,8 +113,9 @@ fn show_dir_listing(w: &MainWindow, store: &AppStore) {
 }
 
 /// Cari + sort + tampilkan (satu-satunya jalur search explorer).
+/// Search berjalan dari folder saat ini (posisi breadcrumb).
 fn run_search(w: &MainWindow, store: &AppStore) {
-    let Some(dir) = store.get_target() else {
+    let Some(dir) = current_dir(store) else {
         w.set_status_text("Pilih folder target dulu.".into());
         return;
     };
@@ -171,6 +203,7 @@ fn main() -> Result<(), slint::PlatformError> {
                 return;
             };
             store.set_target(dir.clone());
+            store.set_current(dir.clone());
             w.set_target_folder(dir.to_string_lossy().to_string().into());
             show_dir_listing(&w, &store);
             save_now(&w);
@@ -221,6 +254,46 @@ fn main() -> Result<(), slint::PlatformError> {
                 w.set_is_search_mode(false);
                 show_dir_listing(&w, &store);
             }
+        });
+    }
+
+    // ── Klik baris/tile: folder → masuk, file → buka default OS ──
+    {
+        let handle = window.as_weak();
+        let store = store.clone();
+        window.on_enter_row(move |idx| {
+            let Some(w) = handle.upgrade() else { return };
+            let Some(e) = store.get(idx as usize) else {
+                return;
+            };
+            if e.is_dir {
+                store.set_current(e.path);
+                w.set_is_search_mode(false);
+                w.set_search_query("".into());
+                show_dir_listing(&w, &store);
+            } else if let Err(err) = actions::open_entry(&e.path) {
+                w.set_status_text(format!("Gagal buka: {}", err).into());
+            }
+        });
+    }
+
+    // ── Klik breadcrumb: naik ke level itu (0 = folder target) ──
+    {
+        let handle = window.as_weak();
+        let store = store.clone();
+        window.on_nav_crumb(move |level| {
+            let Some(w) = handle.upgrade() else { return };
+            let Some(target) = store.get_target() else {
+                return;
+            };
+            let mut path = target;
+            for seg in w.get_crumbs().iter().skip(1).take(level as usize) {
+                path.push(seg.as_str());
+            }
+            store.set_current(path);
+            w.set_is_search_mode(false);
+            w.set_search_query("".into());
+            show_dir_listing(&w, &store);
         });
     }
 
@@ -326,10 +399,12 @@ fn main() -> Result<(), slint::PlatformError> {
             let p = std::path::PathBuf::from(&folder);
             if p.is_dir() {
                 if let Ok(mut entries) = fs::read_dir_entries(&p) {
-                    store.set_target(p);
+                    store.set_target(p.clone());
+                    store.set_current(p);
                     window.set_target_folder(folder.into());
                     fs::sort_entries(&mut entries, &window.get_sort_mode());
                     let n = store.publish(&window, entries);
+                    refresh_crumbs(&window, &store);
                     window.set_status_text(format!("{} entri di folder ini.", n).into());
                 }
             }

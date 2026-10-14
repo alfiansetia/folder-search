@@ -6,7 +6,8 @@ Binary ±10MB, RAM ±40-60MB. Lihat `CHANGELOG.md` untuk riwayat versi.
 ## Fitur (v2.0.0)
 
 - Explorer: pilih folder target (dialog native) + listing sortir
-  (Nama/Tipe/Ukuran/Terbaru).
+  (Nama/Tipe/Ukuran/Terbaru), drill-down folder + breadcrumb,
+  toggle list/grid.
 - Search multi-thread (recursive, case sensitive, exact match),
   max 500 hasil + waktu pencarian (ms), max depth 10.
 - Buka file/folder via aplikasi default + "Lihat" di File Explorer.

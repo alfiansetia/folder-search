@@ -6,6 +6,8 @@ export { Theme } from "theme.slint"; // re-export agar bisa diakses dari Rust (w
 import { AppButton } from "components/app_button.slint";
 import { AppCombo } from "components/app_combo.slint";
 import { FileRow, FileRowItem } from "components/file_row.slint";
+import { FileCellItem } from "components/file_cell.slint";
+import { Crumb } from "components/crumb.slint";
 import { SsRow, SsRowItem, SsHeader } from "components/ss_row.slint";
 import { NavButton } from "components/nav_button.slint";
 import { IconButton } from "components/icon_button.slint";
@@ -37,6 +39,8 @@ export component MainWindow inherits Window {
     in-out property <bool> opt-case: false;
     in-out property <bool> opt-exact: false;
     in-out property <[FileRow]> results: [];
+    in-out property <[string]> crumbs: [];
+    in-out property <string> view-mode: "list"; // "list" | "grid"
 
     // Spreadsheet
     in-out property <string> ss-url: "";
@@ -55,6 +59,8 @@ export component MainWindow inherits Window {
     callback sort-changed();
     callback open-file(int);
     callback reveal-file(int);
+    callback enter-row(int);
+    callback nav-crumb(int);
     callback ss-fetch();
     callback ss-apply-filter();
 
@@ -255,6 +261,47 @@ export component MainWindow inherits Window {
                 }
             }
 
+            // Breadcrumb posisi saat ini + toggle tampilan list/grid.
+            // crumbs diisi Rust (target → current); klik crumb = naik ke level itu.
+            if root.crumbs.length > 0: HorizontalBox {
+                spacing: 6px;
+                Rectangle {
+                    horizontal-stretch: 1;
+                    clip: true;
+                    HorizontalLayout {
+                        spacing: 2px;
+                        alignment: start;
+                        for c[i] in root.crumbs: HorizontalLayout {
+                            spacing: 2px;
+                            if i > 0: VerticalLayout {
+                                alignment: center;
+                                Text {
+                                    text: "›";
+                                    font-size: 12px;
+                                    color: Theme.text-muted;
+                                    vertical-alignment: center;
+                                }
+                            }
+                            Crumb {
+                                label: c;
+                                active: i == root.crumbs.length - 1;
+                                clicked => { root.nav-crumb(i); }
+                            }
+                        }
+                    }
+                }
+                IconButton {
+                    icon: @image-url("icons/list.svg");
+                    tint: root.view-mode == "list" ? Theme.accent : Theme.text-muted;
+                    clicked => { root.view-mode = "list"; }
+                }
+                IconButton {
+                    icon: @image-url("icons/grid.svg");
+                    tint: root.view-mode == "grid" ? Theme.accent : Theme.text-muted;
+                    clicked => { root.view-mode = "grid"; }
+                }
+            }
+
             // Area konten utama: selalu stretch penuh agar window tidak mengecil
             Rectangle {
                 vertical-stretch: 1;
@@ -323,7 +370,7 @@ export component MainWindow inherits Window {
                         }
                     }
                 }
-                if root.results.length > 0: ListView {
+                if root.results.length > 0 && root.view-mode == "list": ListView {
                     width: 100%;
                     height: 100%;
                     for row[idx] in root.results: FileRowItem {
@@ -336,6 +383,27 @@ export component MainWindow inherits Window {
                         row-tint: row.tint;
                         open-clicked(i) => { root.open-file(i); }
                         reveal-clicked(i) => { root.reveal-file(i); }
+                        row-clicked(i) => { root.enter-row(i); }
+                    }
+                }
+                if root.results.length > 0 && root.view-mode == "grid": Flickable {
+                    width: 100%;
+                    height: 100%;
+                    GridLayout {
+                        width: 100%;
+                        spacing: 10px;
+                        for row[idx] in root.results: FileCellItem {
+                            col: row.gcol;
+                            row: row.grow;
+                            cell-name: row.name;
+                            cell-info: row.info;
+                            cell-kind: row.kind;
+                            cell-tint: row.tint;
+                            cell-index: idx;
+                            cell-clicked(i) => { root.enter-row(i); }
+                            open-clicked(i) => { root.open-file(i); }
+                            reveal-clicked(i) => { root.reveal-file(i); }
+                        }
                     }
                 }
             }

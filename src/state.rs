@@ -18,15 +18,22 @@ use std::sync::{Arc, Mutex};
 #[derive(Clone, Default)]
 pub struct AppStore {
     target: Arc<Mutex<Option<PathBuf>>>,
+    current: Arc<Mutex<Option<PathBuf>>>,
     entries: Arc<Mutex<Vec<Entry>>>,
     ss_all: Arc<Mutex<Vec<SsDataRow>>>,
     ss_raw: Arc<Mutex<Vec<Vec<String>>>>,
 }
 
+/// Kolom grid view explorer. Sinkron dengan ukuran tile di
+/// `ui/components/file_cell.slint` (120px + spacing 10px): 6 kolom
+/// muat di lebar konten minimum (900px window − sidebar − padding).
+pub const GRID_COLS: i32 = 6;
+
 impl AppStore {
     pub fn new() -> Self {
         Self {
             target: Arc::new(Mutex::new(None)),
+            current: Arc::new(Mutex::new(None)),
             entries: Arc::new(Mutex::new(Vec::new())),
             ss_all: Arc::new(Mutex::new(Vec::new())),
             ss_raw: Arc::new(Mutex::new(Vec::new())),
@@ -41,9 +48,28 @@ impl AppStore {
         self.target.lock().unwrap().clone()
     }
 
+    /// Folder yang sedang ditampilkan (masuk via klik baris/breadcrumb).
+    pub fn set_current(&self, p: PathBuf) {
+        *self.current.lock().unwrap() = Some(p);
+    }
+
+    pub fn get_current(&self) -> Option<PathBuf> {
+        self.current.lock().unwrap().clone()
+    }
+
     /// Tampilkan entries explorer ke ListView. Return jumlah baris.
+    /// Sekaligus isi posisi grid (gcol/grow) untuk view-mode "grid".
     pub fn publish(&self, w: &MainWindow, entries: Vec<Entry>) -> usize {
-        let rows: Vec<FileRow> = entries.iter().map(to_row).collect();
+        let rows: Vec<FileRow> = entries
+            .iter()
+            .enumerate()
+            .map(|(i, e)| {
+                let mut r = to_row(e);
+                r.gcol = (i as i32) % GRID_COLS;
+                r.grow = (i as i32) / GRID_COLS;
+                r
+            })
+            .collect();
         let n = rows.len();
         *self.entries.lock().unwrap() = entries;
         w.set_results(ModelRc::new(VecModel::from(rows)));
@@ -113,6 +139,8 @@ pub fn to_row(e: &Entry) -> FileRow {
         is_dir: e.is_dir,
         kind: kind.into(),
         tint: Color::from_rgb_u8(r, g, b),
+        gcol: 0,
+        grow: 0,
     }
 }
 

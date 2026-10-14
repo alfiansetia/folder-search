@@ -1,0 +1,74 @@
+// Tile grid explorer (pasangan FileRowItem untuk view-mode "grid").
+// Klik tile = masuk folder / buka file (via cell-clicked → enter-row).
+// TouchArea ditaruh PALING ATAS (di belakang konten) agar IconButton
+// mini tetap menerima klik (pelajaran dari file_row.slint).
+// Lebar tetap 120px: GRID_COLS=6 di state.rs dihitung dari angka ini.
+import { Theme } from "../theme.slint";
+import { IconButton } from "icon_button.slint";
+import { FileTypeIcon } from "file_icon.slint";
+
+export component FileCellItem inherits Rectangle {
+    in property <string> cell-name;
+    in property <string> cell-info;
+    in property <string> cell-kind;
+    in property <color> cell-tint;
+    in property <int> cell-index;
+
+    callback cell-clicked(int);
+    callback open-clicked(int);
+    callback reveal-clicked(int);
+
+    width: 120px;
+    height: 140px;
+    border-radius: Theme.radius-sm;
+    background: touch.has-hover ? Theme.bg-hover : transparent;
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.cell-clicked(root.cell-index); }
+    }
+
+    VerticalLayout {
+        padding: 8px;
+        spacing: 4px;
+        alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            FileTypeIcon {
+                kind: root.cell-kind;
+                tint: root.cell-tint;
+                box-size: 48px;
+                icon-size: 26px;
+            }
+        }
+        Text {
+            text: root.cell-name;
+            font-size: 12px;
+            color: Theme.text-primary;
+            horizontal-alignment: center;
+            overflow: elide;
+        }
+        Text {
+            text: root.cell-info;
+            font-size: 10px;
+            color: Theme.text-muted;
+            horizontal-alignment: center;
+        }
+        HorizontalLayout {
+            alignment: center;
+            spacing: 2px;
+            IconButton {
+                icon: @image-url("../icons/external.svg");
+                btn-size: 26px;
+                icon-size: 14px;
+                clicked => { root.open-clicked(root.cell-index); }
+            }
+            IconButton {
+                icon: @image-url("../icons/eye.svg");
+                btn-size: 26px;
+                icon-size: 14px;
+                clicked => { root.reveal-clicked(root.cell-index); }
+            }
+        }
+    }
+}

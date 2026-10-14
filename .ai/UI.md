@@ -77,7 +77,14 @@ for row[idx] in root.xyz-results: XyzItem {
 ## Daftar komponen
 
 - `FileRowItem` + `struct FileRow` (`components/file_row.slint`) — list explorer
-  (ikon tipe via `kind`+`tint`, aksi via `IconButton`).
+  (ikon via `FileTypeIcon`; klik baris = masuk folder / buka file;
+  `gcol`/`grow` = posisi tile untuk grid view, diisi `publish()`).
+- `FileCellItem` (`components/file_cell.slint`) — tile grid explorer
+  (120px, `col`/`row` diset di `app.slint` dari `gcol`/`grow`).
+- `FileTypeIcon` (`components/file_icon.slint`) — ikon tipe + tint,
+  dipakai list & grid (satu-satunya rantai `if kind == "…"`).
+- `Crumb` (`components/crumb.slint`) — satu segmen breadcrumb
+  (klik = `nav-crumb(index)`; segmen aktif tak bisa diklik).
 - `SsHeader`, `SsRowItem` + `struct SsRow` (`components/ss_row.slint`) — tabel SS.
 - `NavButton` (`components/nav_button.slint`) — tombol sidebar ikon saja
   (label opsional: Text hanya tampil bila `label != ""`; ikon alternatif via

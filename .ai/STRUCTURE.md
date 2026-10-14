@@ -16,7 +16,10 @@
 │   ├── theme.slint        # Global Theme: semua warna (gelap/terang).
 │   ├── icons/             # SVG stroke-putih (folder, file, …); tampil via colorize.
 │   └── components/
-│       ├── file_row.slint # Struct FileRow + FileRowItem (list explorer).
+│       ├── file_row.slint # Struct FileRow (+gcol/grow grid) + FileRowItem (list, klik = masuk/buka).
+│       ├── file_cell.slint  # FileCellItem: tile grid (klik = masuk/buka).
+│       ├── file_icon.slint  # FileTypeIcon: ikon tipe + tint (dipakai list & grid).
+│       ├── crumb.slint      # Crumb: satu segmen breadcrumb (klik = naik level).
 │       ├── ss_row.slint   # Struct SsRow + SsHeader + SsRowItem (tabel SS).
 │       ├── nav_button.slint, icon_button.slint  # Tombol sidebar + tombol ikon.
 │       ├── check_row.slint, search_field.slint  # Checkbox + input teks bertema.
