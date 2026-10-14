@@ -31,23 +31,24 @@ fn apply_theme(w: &MainWindow, light: bool) {
         // Palet terang = variabel [data-theme="light"] style.css versi lama.
         t.set_bg_base(Color::from_rgb_u8(243, 244, 248));
         t.set_bg_surface(Color::from_rgb_u8(255, 255, 255));
-        t.set_bg_elevated(Color::from_rgb_u8(240, 241, 245));
-        t.set_bg_hover(Color::from_rgb_u8(229, 231, 238));
-        t.set_border(Color::from_argb_u8(18, 0, 0, 0));
+        t.set_bg_elevated(Color::from_rgb_u8(237, 238, 244));
+        t.set_bg_hover(Color::from_rgb_u8(225, 227, 235));
+        t.set_border(Color::from_argb_u8(40, 0, 0, 0));
         t.set_accent(Color::from_rgb_u8(88, 86, 214));
         t.set_accent_light(Color::from_rgb_u8(79, 77, 208));
-        t.set_accent_dim(Color::from_argb_u8(26, 88, 86, 214));
+        t.set_accent_dim(Color::from_argb_u8(30, 88, 86, 214));
         t.set_text_primary(Color::from_rgb_u8(28, 30, 40));
-        t.set_text_secondary(Color::from_rgb_u8(90, 94, 120));
-        t.set_text_muted(Color::from_rgb_u8(148, 152, 176));
-        t.set_warn(Color::from_rgb_u8(220, 38, 38));
-        t.set_warn_bg(Color::from_argb_u8(31, 220, 38, 38));
+        t.set_text_secondary(Color::from_rgb_u8(80, 84, 110));
+        t.set_text_muted(Color::from_rgb_u8(130, 135, 160));
+        t.set_warn(Color::from_rgb_u8(200, 30, 30));
+        t.set_warn_bg(Color::from_argb_u8(35, 200, 30, 30));
+        t.set_check_mark(Color::from_rgb_u8(255, 255, 255));
     } else {
         t.set_bg_base(Color::from_rgb_u8(13, 15, 20));
         t.set_bg_surface(Color::from_rgb_u8(20, 23, 32));
         t.set_bg_elevated(Color::from_rgb_u8(26, 29, 39));
         t.set_bg_hover(Color::from_rgb_u8(31, 34, 50));
-        t.set_border(Color::from_argb_u8(15, 255, 255, 255));
+        t.set_border(Color::from_argb_u8(25, 255, 255, 255));
         t.set_accent(Color::from_rgb_u8(99, 102, 241));
         t.set_accent_light(Color::from_rgb_u8(129, 140, 248));
         t.set_accent_dim(Color::from_argb_u8(38, 99, 102, 241));
@@ -56,6 +57,7 @@ fn apply_theme(w: &MainWindow, light: bool) {
         t.set_text_muted(Color::from_rgb_u8(78, 82, 112));
         t.set_warn(Color::from_rgb_u8(248, 113, 113));
         t.set_warn_bg(Color::from_argb_u8(31, 248, 113, 113));
+        t.set_check_mark(Color::from_rgb_u8(255, 255, 255));
     }
 }
 

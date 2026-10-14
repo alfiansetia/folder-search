@@ -1,6 +1,6 @@
 // MainWindow — sidebar + 2 view. Detail di ui/components/.
 // Section label caps ala .tp-label versi lama. Empty-state bila list kosong.
-import { Button, LineEdit, ComboBox, ListView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { Button, ComboBox, ListView, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { Theme } from "theme.slint";
 export { Theme } from "theme.slint"; // re-export agar bisa diakses dari Rust (window.global::<Theme>())
 import { FileRow, FileRowItem } from "components/file_row.slint";
@@ -8,6 +8,7 @@ import { SsRow, SsRowItem, SsHeader } from "components/ss_row.slint";
 import { NavButton } from "components/nav_button.slint";
 import { IconButton } from "components/icon_button.slint";
 import { CheckRow } from "components/check_row.slint";
+import { SearchField } from "components/search_field.slint";
 
 export component MainWindow inherits Window {
     title: "FolderScope Native (Rust + Slint)";
@@ -57,29 +58,67 @@ export component MainWindow inherits Window {
     HorizontalLayout {
         spacing: 0px;
 
-        // ── Sidebar (ikon saja) ──
-        VerticalLayout {
-            width: 70px;
-            padding: 8px;
-            spacing: 6px;
-            alignment: start;
-            NavButton {
-                icon: @image-url("icons/folder.svg");
-                active: root.current-view == "explorer";
-                clicked => { root.switch-view("explorer"); }
-            }
-            NavButton {
-                icon: @image-url("icons/grid.svg");
-                active: root.current-view == "spreadsheet";
-                clicked => { root.switch-view("spreadsheet"); }
-            }
-            Rectangle { vertical-stretch: 1; }
-            NavButton {
-                icon: @image-url("icons/moon.svg");
-                icon-alt: @image-url("icons/sun.svg");
-                use-alt: root.is-light;
-                active: root.is-light;
-                clicked => { root.toggle-theme(); }
+        // ── Sidebar ──
+        Rectangle {
+            width: 78px;
+            background: Theme.bg-surface;
+            VerticalLayout {
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-top: 12px;
+                padding-bottom: 12px;
+                spacing: 6px;
+                alignment: start;
+
+                HorizontalLayout {
+                    alignment: center;
+                    Rectangle {
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 11px;
+                        background: Theme.accent;
+                        HorizontalLayout {
+                            alignment: center;
+                            VerticalLayout {
+                                alignment: center;
+                                Text {
+                                    text: "FS";
+                                    font-size: 15px;
+                                    font-weight: 700;
+                                    color: Theme.check-mark;
+                                    horizontal-alignment: center;
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle { height: 6px; }
+                NavButton {
+                    label: "Explorer";
+                    icon: @image-url("icons/folder.svg");
+                    active: root.current-view == "explorer";
+                    clicked => { root.switch-view("explorer"); }
+                }
+                NavButton {
+                    label: "Sheet";
+                    icon: @image-url("icons/grid.svg");
+                    active: root.current-view == "spreadsheet";
+                    clicked => { root.switch-view("spreadsheet"); }
+                }
+                Rectangle { vertical-stretch: 1; }
+                Rectangle {
+                    height: 1px;
+                    horizontal-stretch: 1;
+                    background: Theme.border;
+                }
+                NavButton {
+                    label: root.is-light ? "Terang" : "Gelap";
+                    icon: @image-url("icons/moon.svg");
+                    icon-alt: @image-url("icons/sun.svg");
+                    use-alt: root.is-light;
+                    active: root.is-light;
+                    clicked => { root.toggle-theme(); }
+                }
             }
         }
 
@@ -89,7 +128,9 @@ export component MainWindow inherits Window {
         }
 
         // ── Explorer view ──
-        if root.current-view == "explorer": VerticalBox {
+        if root.current-view == "explorer": VerticalLayout {
+            horizontal-stretch: 1;
+            vertical-stretch: 1;
             padding: 14px;
             spacing: 8px;
 
@@ -103,6 +144,8 @@ export component MainWindow inherits Window {
             Rectangle {
                 background: Theme.bg-surface;
                 border-radius: Theme.radius;
+                border-width: 1px;
+                border-color: Theme.border;
                 VerticalLayout {
                     padding: 10px;
                     spacing: 8px;
@@ -159,7 +202,7 @@ export component MainWindow inherits Window {
             }
             HorizontalBox {
                 spacing: 8px;
-                LineEdit {
+                SearchField {
                     text <=> root.search-query;
                     placeholder-text: "Cari nama file/folder… (Enter = cari)";
                     horizontal-stretch: 1;
@@ -198,48 +241,96 @@ export component MainWindow inherits Window {
                 }
             }
 
-            if root.results.length == 0: VerticalLayout {
-                spacing: 10px;
-                padding-top: 36px;
-                padding-bottom: 36px;
-                Image {
-                    source: @image-url("icons/folder.svg");
-                    width: 40px;
-                    height: 40px;
-                    colorize: Theme.text-muted;
-                }
-                Text {
-                    text: root.target-folder == "" ? "Pilih folder target untuk mulai" : "Tidak ada yang ditampilkan";
-                    color: Theme.text-muted;
-                    horizontal-alignment: center;
-                }
-                if root.target-folder == "": HorizontalLayout {
-                    alignment: center;
-                    Button {
-                        text: "Pilih Folder";
-                        primary: true;
-                        clicked => { root.pick-folder(); }
+            // Area konten utama: selalu stretch penuh agar window tidak mengecil
+            Rectangle {
+                vertical-stretch: 1;
+                background: transparent;
+                clip: true;
+
+                if root.results.length == 0: Rectangle {
+                    // empty-state tetap full-height
+                    width: 100%;
+                    height: 100%;
+                    background: transparent;
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: 12px;
+                        HorizontalLayout {
+                            alignment: center;
+                            Rectangle {
+                                width: 56px;
+                                height: 56px;
+                                border-radius: 28px;
+                                background: Theme.accent-dim;
+                                HorizontalLayout {
+                                    alignment: center;
+                                    VerticalLayout {
+                                        alignment: center;
+                                        Image {
+                                            source: root.is-search-mode
+                                                ? @image-url("icons/file.svg")
+                                                : @image-url("icons/folder.svg");
+                                            width: 28px;
+                                            height: 28px;
+                                            colorize: Theme.accent-light;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Text {
+                            text: root.target-folder == ""
+                                ? "Pilih folder target untuk mulai"
+                                : root.is-search-mode
+                                    ? "Tidak ditemukan hasil pencarian"
+                                    : "Folder kosong";
+                            font-size: 14px;
+                            font-weight: 500;
+                            color: Theme.text-secondary;
+                            horizontal-alignment: center;
+                        }
+                        Text {
+                            text: root.target-folder == ""
+                                ? "Klik tombol Pilih Folder di atas"
+                                : root.is-search-mode
+                                    ? "Coba kata kunci lain atau ubah opsi pencarian"
+                                    : "Tidak ada file atau subfolder di sini";
+                            font-size: 12px;
+                            color: Theme.text-muted;
+                            horizontal-alignment: center;
+                        }
+                        if root.target-folder == "": HorizontalLayout {
+                            alignment: center;
+                            Button {
+                                text: "Pilih Folder";
+                                primary: true;
+                                clicked => { root.pick-folder(); }
+                            }
+                        }
                     }
                 }
-            }
-            if root.results.length > 0: ListView {
-                vertical-stretch: 1;
-                for row[idx] in root.results: FileRowItem {
-                    row-name: row.name;
-                    row-path: row.path;
-                    row-info: row.info;
-                    row-is-dir: row.is-dir;
-                    row-index: idx;
-                    row-kind: row.kind;
-                    row-tint: row.tint;
-                    open-clicked(i) => { root.open-file(i); }
-                    reveal-clicked(i) => { root.reveal-file(i); }
+                if root.results.length > 0: ListView {
+                    width: 100%;
+                    height: 100%;
+                    for row[idx] in root.results: FileRowItem {
+                        row-name: row.name;
+                        row-path: row.path;
+                        row-info: row.info;
+                        row-is-dir: row.is-dir;
+                        row-index: idx;
+                        row-kind: row.kind;
+                        row-tint: row.tint;
+                        open-clicked(i) => { root.open-file(i); }
+                        reveal-clicked(i) => { root.reveal-file(i); }
+                    }
                 }
             }
         }
 
         // ── Spreadsheet view ──
-        if root.current-view == "spreadsheet": VerticalBox {
+        if root.current-view == "spreadsheet": VerticalLayout {
+            horizontal-stretch: 1;
+            vertical-stretch: 1;
             padding: 14px;
             spacing: 8px;
 
@@ -252,7 +343,7 @@ export component MainWindow inherits Window {
             }
             HorizontalBox {
                 spacing: 8px;
-                LineEdit {
+                SearchField {
                     text <=> root.ss-url;
                     placeholder-text: "https://…/api… (JSON Array)";
                     horizontal-stretch: 1;
@@ -277,11 +368,11 @@ export component MainWindow inherits Window {
             }
             HorizontalBox {
                 spacing: 8px;
-                LineEdit {
+                SearchField {
                     text <=> root.ss-query;
                     placeholder-text: "Cari NO / KODE / NAME…";
                     horizontal-stretch: 1;
-                    edited(t) => { root.ss-query = t; root.ss-apply-filter(); }
+                    edited(t) => { root.ss-apply-filter(); }
                 }
                 ComboBox {
                     model: ["Semua", "Lengkap", "Tidak Lengkap"];
@@ -300,26 +391,54 @@ export component MainWindow inherits Window {
             Rectangle {
                 background: Theme.bg-surface;
                 border-radius: Theme.radius;
+                border-width: 1px;
+                border-color: Theme.border;
                 vertical-stretch: 1;
                 clip: true;
                 VerticalLayout {
                     spacing: 0px;
-                    padding: 4px;
+                    padding: 0px;
                     SsHeader { }
-                    if root.ss-results.length == 0: VerticalLayout {
-                        spacing: 10px;
-                        padding-top: 28px;
-                        padding-bottom: 28px;
-                        Image {
-                            source: @image-url("icons/grid.svg");
-                            width: 36px;
-                            height: 36px;
-                            colorize: Theme.text-muted;
-                        }
-                        Text {
-                            text: "Masukkan URL API di atas lalu klik Ambil Data";
-                            color: Theme.text-muted;
-                            horizontal-alignment: center;
+                    if root.ss-results.length == 0: Rectangle {
+                        vertical-stretch: 1;
+                        background: transparent;
+                        VerticalLayout {
+                            alignment: center;
+                            spacing: 12px;
+                            HorizontalLayout {
+                                alignment: center;
+                                Rectangle {
+                                    width: 52px;
+                                    height: 52px;
+                                    border-radius: 26px;
+                                    background: Theme.accent-dim;
+                                    HorizontalLayout {
+                                        alignment: center;
+                                        VerticalLayout {
+                                            alignment: center;
+                                            Image {
+                                                source: @image-url("icons/grid.svg");
+                                                width: 26px;
+                                                height: 26px;
+                                                colorize: Theme.accent-light;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Text {
+                                text: "Belum ada data";
+                                font-size: 14px;
+                                font-weight: 500;
+                                color: Theme.text-secondary;
+                                horizontal-alignment: center;
+                            }
+                            Text {
+                                text: "Masukkan URL API di atas lalu klik Ambil Data";
+                                font-size: 12px;
+                                color: Theme.text-muted;
+                                horizontal-alignment: center;
+                            }
                         }
                     }
                     if root.ss-results.length > 0: ListView {

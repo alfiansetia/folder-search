@@ -85,4 +85,7 @@ for row[idx] in root.xyz-results: XyzItem {
 - `IconButton` (`components/icon_button.slint`) — tombol ikon kecil (hover).
 - `CheckRow` (`components/check_row.slint`) — checkbox bertema (pengganti
   `CheckBox` standar yang labelnya tak terbaca di mode Terang).
+- `SearchField` (`components/search_field.slint`) — input teks bertema
+  (`TextInput` + placeholder manual + border fokus accent, pengganti
+  `LineEdit` standar yang tak terbaca di mode Terang).
 - Kandidat ekstrak berikutnya saat membesar: `top_bar.slint`, `search_bar.slint`.

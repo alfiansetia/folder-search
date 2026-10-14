@@ -12,34 +12,40 @@ export component NavButton inherits Rectangle {
 
     callback clicked();
 
-    width: 54px;
-    height: 50px;
+    width: 58px;
+    height: 54px;
     border-radius: Theme.radius;
     background: active ? Theme.accent-dim : (touch.has-hover ? Theme.bg-hover : transparent);
 
     if active: Rectangle {
         width: 3px;
         height: 20px;
-        x: 1px;
+        x: 0px;
         y: (parent.height - self.height) / 2;
         background: Theme.accent;
         border-radius: 2px;
     }
 
-    VerticalLayout {
-        spacing: 3px;
+    HorizontalLayout {
         alignment: center;
-        Image {
-            source: use-alt ? icon-alt : icon;
-            width: 21px;
-            height: 21px;
-            colorize: active ? tint : Theme.text-muted;
-        }
-        if label != "": Text {
-            text: label;
-            font-size: 10px;
-            color: active ? tint : Theme.text-muted;
-            horizontal-alignment: center;
+        VerticalLayout {
+            alignment: center;
+            spacing: 3px;
+            HorizontalLayout {
+                alignment: center;
+                Image {
+                    source: use-alt ? icon-alt : icon;
+                    width: 21px;
+                    height: 21px;
+                    colorize: active ? tint : Theme.text-muted;
+                }
+            }
+            if label != "": Text {
+                text: label;
+                font-size: 10px;
+                color: active ? tint : Theme.text-muted;
+                horizontal-alignment: center;
+            }
         }
     }
 

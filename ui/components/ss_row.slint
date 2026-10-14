@@ -22,24 +22,30 @@ export struct SsRow {
 export component SsHeader inherits VerticalLayout {
     spacing: 0px;
     padding: 0px;
-    HorizontalLayout {
-        spacing: 8px;
-        padding-top: 8px;
-        padding-bottom: 8px;
-        padding-left: 10px;
-        padding-right: 10px;
-        Text { text: "NO"; width: 44px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "KODE"; width: 100px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "NAME"; horizontal-stretch: 1; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "CAT"; width: 80px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "UOM"; width: 64px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "P"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "L"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "T"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
-        Text { text: "B"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+    horizontal-stretch: 1;
+    Rectangle {
+        horizontal-stretch: 1;
+        background: Theme.bg-elevated;
+        HorizontalLayout {
+            spacing: 8px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+            Text { text: "NO"; width: 44px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "KODE"; width: 100px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "NAME"; horizontal-stretch: 1; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "CAT"; width: 80px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "UOM"; width: 64px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "P"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "L"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "T"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "B"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+        }
     }
     Rectangle {
-        height: 2px;
+        horizontal-stretch: 1;
+        height: 1px;
         background: Theme.border;
     }
 }
@@ -60,7 +66,7 @@ export component SsRowItem inherits Rectangle {
     in property <bool> warn-t;
     in property <bool> warn-b;
 
-    background: row-incomplete ? Theme.warn-bg : transparent;
+    background: row-incomplete ? Theme.warn-bg : (touch.has-hover ? Theme.bg-hover : transparent);
 
     VerticalLayout {
         spacing: 0px;
@@ -71,7 +77,7 @@ export component SsRowItem inherits Rectangle {
             padding-left: 10px;
             padding-right: 10px;
             Text { text: c-no; width: 44px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
-            Text { text: c-kode; width: 100px; font-size: 12px; color: Theme.text-primary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-kode; width: 100px; font-size: 12px; color: Theme.text-primary; font-weight: 500; overflow: elide; vertical-alignment: center; }
             Text { text: c-name; horizontal-stretch: 1; font-size: 12px; color: Theme.text-primary; font-italic: row-incomplete; overflow: elide; vertical-alignment: center; }
             Text { text: c-cat; width: 80px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
             Text { text: c-uom; width: 64px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
@@ -84,5 +90,9 @@ export component SsRowItem inherits Rectangle {
             height: 1px;
             background: Theme.border;
         }
+    }
+
+    touch := TouchArea {
+        mouse-cursor: default;
     }
 }

@@ -1,0 +1,71 @@
+// Input teks bertema (pengganti LineEdit standar).
+// Alasan: LineEdit fluent-dark tidak mengikuti Theme, teksnya tak terbaca
+// di mode Terang. Komponen ini selalu pakai Theme.text-primary /
+// Theme.text-muted sehingga terbaca di kedua mode.
+import { Theme } from "../theme.slint";
+
+export component SearchField inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder-text;
+    in property <bool> enabled: true;
+
+    callback accepted();
+    callback edited(string);
+
+    height: 34px;
+    horizontal-stretch: 1;
+    background: root.enabled ? Theme.bg-elevated : Theme.bg-surface;
+    border-radius: Theme.radius-sm;
+    border-width: 1px;
+    border-color: input.has-focus ? Theme.accent : Theme.border;
+    opacity: root.enabled ? 1 : 0.6;
+    clip: true;
+
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 10px;
+        spacing: 6px;
+
+        VerticalLayout {
+            alignment: center;
+            horizontal-stretch: 1;
+
+            Rectangle {
+                horizontal-stretch: 1;
+                height: 20px;
+                background: transparent;
+
+                input := TextInput {
+                    x: 0;
+                    y: 0;
+                    width: 100%;
+                    height: 100%;
+                    text <=> root.text;
+                    enabled: root.enabled;
+                    single-line: true;
+                    font-size: 13px;
+                    color: Theme.text-primary;
+                    selection-background-color: Theme.accent;
+                    selection-foreground-color: Theme.check-mark;
+                    vertical-alignment: center;
+                    accepted => { root.accepted(); }
+                    edited => { root.edited(root.text); }
+                }
+
+                // Placeholder manual (TextInput tak punya placeholder-text).
+                // Text tak menangani mouse, jadi klik tembus ke TextInput.
+                if root.text == "": Text {
+                    x: 0;
+                    y: 0;
+                    width: 100%;
+                    height: 100%;
+                    text: root.placeholder-text;
+                    font-size: 13px;
+                    color: Theme.text-muted;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+        }
+    }
+}
