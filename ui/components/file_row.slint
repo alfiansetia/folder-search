@@ -27,6 +27,10 @@ export component FileRowItem inherits Rectangle {
     background: touch.has-hover ? Theme.bg-hover : transparent;
     border-radius: Theme.radius-sm;
 
+    touch := TouchArea {
+        mouse-cursor: pointer;
+    }
+
     VerticalLayout {
         spacing: 0px;
         padding: 0px;
@@ -109,9 +113,5 @@ export component FileRowItem inherits Rectangle {
             height: 1px;
             background: Theme.border;
         }
-    }
-
-    touch := TouchArea {
-        mouse-cursor: pointer;
     }
 }

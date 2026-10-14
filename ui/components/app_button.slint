@@ -1,0 +1,59 @@
+// Tombol bertema (pengganti Button standar).
+// Alasan: Button fluent-dark tidak mengikuti Theme, teksnya tak terbaca
+// di mode Terang (khususnya varian sekunder seperti "Reset").
+// Varian primer = bg accent + teks putih; sekunder = bg-elevated + border.
+import { Theme } from "../theme.slint";
+
+export component AppButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> primary: false;
+    in property <bool> enabled: true;
+    in property <image> icon;
+    in property <bool> has-icon: false;
+
+    callback clicked();
+
+    height: 34px;
+    border-radius: Theme.radius-sm;
+    border-width: 1px;
+    border-color: root.primary ? transparent : Theme.border;
+    background: !root.enabled ? Theme.bg-elevated
+        : root.primary
+            ? (touch.pressed ? Theme.accent-light : touch.has-hover ? Theme.accent-light : Theme.accent)
+            : (touch.pressed ? Theme.bg-hover : touch.has-hover ? Theme.bg-hover : Theme.bg-elevated);
+    opacity: root.enabled ? 1 : 0.55;
+    clip: true;
+
+    HorizontalLayout {
+        alignment: center;
+        spacing: 6px;
+        padding-left: 14px;
+        padding-right: 14px;
+        VerticalLayout {
+            alignment: center;
+            if root.has-icon: Image {
+                source: root.icon;
+                width: 15px;
+                height: 15px;
+                colorize: root.primary ? Theme.check-mark : Theme.text-primary;
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            Text {
+                text: root.text;
+                font-size: 13px;
+                font-weight: root.primary ? 700 : 500;
+                color: root.primary ? Theme.check-mark : Theme.text-primary;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+
+    touch := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: root.enabled ? pointer : default;
+        clicked => { root.clicked(); }
+    }
+}

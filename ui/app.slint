@@ -1,8 +1,10 @@
 // MainWindow — sidebar + 2 view. Detail di ui/components/.
 // Section label caps ala .tp-label versi lama. Empty-state bila list kosong.
-import { Button, ComboBox, ListView, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { ListView, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { Theme } from "theme.slint";
 export { Theme } from "theme.slint"; // re-export agar bisa diakses dari Rust (window.global::<Theme>())
+import { AppButton } from "components/app_button.slint";
+import { AppCombo } from "components/app_combo.slint";
 import { FileRow, FileRowItem } from "components/file_row.slint";
 import { SsRow, SsRowItem, SsHeader } from "components/ss_row.slint";
 import { NavButton } from "components/nav_button.slint";
@@ -11,7 +13,8 @@ import { CheckRow } from "components/check_row.slint";
 import { SearchField } from "components/search_field.slint";
 
 export component MainWindow inherits Window {
-    title: "FolderScope Native (Rust + Slint)";
+    title: "FolderScope";
+    icon: @image-url("../assets/icon.jpg");
     min-width: 900px;
     min-height: 600px;
     preferred-width: 1280px;
@@ -178,7 +181,7 @@ export component MainWindow inherits Window {
                     }
                     HorizontalLayout {
                         spacing: 8px;
-                        Button {
+                        AppButton {
                             text: "Pilih Folder";
                             primary: true;
                             horizontal-stretch: 1;
@@ -208,8 +211,8 @@ export component MainWindow inherits Window {
                     horizontal-stretch: 1;
                     accepted => { root.do-search(); }
                 }
-                Button { text: "Cari"; primary: true; clicked => { root.do-search(); } }
-                Button { text: "Reset"; clicked => { root.clear-search(); } }
+                AppButton { text: "Cari"; primary: true; clicked => { root.do-search(); } }
+                AppButton { text: "Reset"; clicked => { root.clear-search(); } }
             }
             HorizontalBox {
                 spacing: 16px;
@@ -234,7 +237,7 @@ export component MainWindow inherits Window {
                     color: Theme.text-muted;
                     vertical-alignment: center;
                 }
-                ComboBox {
+                AppCombo {
                     model: ["Nama", "Tipe", "Ukuran", "Terbaru"];
                     current-value <=> root.sort-mode;
                     selected(v) => { root.sort-mode = v; root.sort-changed(); }
@@ -301,7 +304,7 @@ export component MainWindow inherits Window {
                         }
                         if root.target-folder == "": HorizontalLayout {
                             alignment: center;
-                            Button {
+                            AppButton {
                                 text: "Pilih Folder";
                                 primary: true;
                                 clicked => { root.pick-folder(); }
@@ -350,7 +353,8 @@ export component MainWindow inherits Window {
                     enabled: !root.ss-loading;
                     accepted => { root.ss-fetch(); }
                 }
-                Button {
+                AppButton {
+                    has-icon: true;
                     icon: @image-url("icons/download.svg");
                     text: root.ss-loading ? "Memuat…" : "Ambil Data";
                     primary: true;
@@ -374,7 +378,7 @@ export component MainWindow inherits Window {
                     horizontal-stretch: 1;
                     edited(t) => { root.ss-apply-filter(); }
                 }
-                ComboBox {
+                AppCombo {
                     model: ["Semua", "Lengkap", "Tidak Lengkap"];
                     current-value <=> root.ss-status-label;
                     selected(v) => { root.ss-status-label = v; root.ss-apply-filter(); }
