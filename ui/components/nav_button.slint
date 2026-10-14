@@ -1,0 +1,50 @@
+// Tombol navigasi sidebar (pengganti .sidebar-icon-btn versi lama):
+// ikon + label, state aktif (bar accent + tint), hover.
+import { Theme } from "../theme.slint";
+
+export component NavButton inherits Rectangle {
+    in property <image> icon;
+    in property <image> icon-alt;
+    in property <bool> use-alt: false;
+    in property <string> label;
+    in property <bool> active: false;
+    in property <color> tint: Theme.accent-light;
+
+    callback clicked();
+
+    width: 54px;
+    height: 50px;
+    border-radius: Theme.radius;
+    background: active ? Theme.accent-dim : (touch.has-hover ? Theme.bg-hover : transparent);
+
+    if active: Rectangle {
+        width: 3px;
+        height: 20px;
+        x: 1px;
+        y: (parent.height - self.height) / 2;
+        background: Theme.accent;
+        border-radius: 2px;
+    }
+
+    VerticalLayout {
+        spacing: 3px;
+        alignment: center;
+        Image {
+            source: use-alt ? icon-alt : icon;
+            width: 21px;
+            height: 21px;
+            colorize: active ? tint : Theme.text-muted;
+        }
+        if label != "": Text {
+            text: label;
+            font-size: 10px;
+            color: active ? tint : Theme.text-muted;
+            horizontal-alignment: center;
+        }
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}

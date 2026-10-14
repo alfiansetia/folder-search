@@ -1,0 +1,45 @@
+// Checkbox custom bertema (pengganti CheckBox standar).
+// Alasan: label CheckBox fluent-dark tidak terbaca di mode Terang.
+// Label selalu pakai Theme.text-primary. Klik di mana saja (kotak+label).
+import { Theme } from "../theme.slint";
+
+export component CheckRow inherits HorizontalLayout {
+    in property <string> label;
+    in-out property <bool> checked: false;
+
+    spacing: 8px;
+
+    VerticalLayout {
+        alignment: center;
+        Rectangle {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: checked ? Theme.accent : transparent;
+            border-width: 1px;
+            border-color: checked ? Theme.accent : Theme.text-muted;
+            HorizontalLayout {
+                alignment: center;
+                VerticalLayout {
+                    alignment: center;
+                    if checked: Image {
+                        source: @image-url("../icons/check.svg");
+                        width: 11px;
+                        height: 11px;
+                    }
+                }
+            }
+        }
+    }
+    Text {
+        text: label;
+        font-size: 12px;
+        color: Theme.text-primary;
+        vertical-alignment: center;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.checked = !root.checked; }
+    }
+}

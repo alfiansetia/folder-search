@@ -1,56 +1,34 @@
-# 🗂️ FolderScope — Desktop Manager & Spreadsheet API
+# FolderScope Native — File Manager (Rust + Slint)
 
-**FolderScope** adalah aplikasi desktop modern berbasis Electron.js yang dirancang untuk manajemen file lokal dan pengolahan data API Spreadsheet. Aplikasi ini menawarkan antarmuka premium, performa cepat, dan fitur persistensi data yang kuat.
+Rewrite native dari versi Electron lama: tanpa webview, tanpa Chromium.
+Binary ~6-10MB, RAM ~40-60MB.
 
-![App Icon](assets/icon.png)
+## Fitur (v0.1.0)
 
-## ✨ Fitur Utama (v1.1.0)
-- **Explorer Mode:** Menjelajahi folder lokal dengan tampilan Grid atau List yang elegan.
-- **Search Engine:** Pencarian file rekursif yang cepat dengan opsi *Case Sensitive* dan *Exact Match*.
-- **Spreadsheet API (New):** Menarik data langsung dari JSON API ke dalam tabel spreadsheet yang interaktif.
-- **Smart Filtering:** 
-  - Filter file berdasarkan kategori (Gambar, Video, Kode, Dokumen, Arsip).
-  - Filter status data spreadsheet (Lengkap / Tidak Lengkap) berdasarkan validasi parameter P, L, T, dan B.
-- **Local Persistence:** Aplikasi mengingat folder terakhir yang Anda pilih dan melakukan caching pada data spreadsheet API sehingga data tetap tersedia saat aplikasi dibuka kembali.
-- **Modern UI/UX:** Tampilan gelap (Dark Mode) premium dengan animasi halus dan *Auto-hide Toolbar* yang cerdas.
+- Pilih folder target (dialog native) + listing sort A-Z.
+- Search paralel multi-thread (recursive, case sensitive, exact match),
+  max 500 hasil + waktu pencarian (ms), max depth 10.
+- Buka file/folder via aplikasi default + "Lihat" di File Explorer.
+- UI dark native (Slint, GPU).
 
-## 🚀 Instalasi (Development)
+## Prasyarat
 
-Jika Anda ingin menjalankan aplikasi ini dari kode sumber:
+1. Rust stable: `winget install Rustlang.Rustup`, lalu restart terminal.
+2. Windows: VS Build Tools / VS Community dengan workload VCTools (linker MSVC).
 
-1.  **Prasyarat:** Pastikan [Node.js](https://nodejs.org/) sudah terinstal di komputer Anda.
-2.  **Install Dependensi:**
-    ```bash
-    npm install
-    ```
-3.  **Jalankan Aplikasi:**
-    ```bash
-    npm run dev
-    ```
-    *(Gunakan `npm run dev` untuk mengaktifkan fitur debugging).*
+## Jalankan
 
-## 📦 Build Menjadi Aplikasi (.exe)
+```powershell
+cargo run
+```
 
-Untuk mengompilasi kode ini menjadi aplikasi siap pakai (.exe):
+## Struktur
 
-1.  **Build Installer (NSIS):**
-    Menghasilkan file `.exe` setup yang bisa diinstal di komputer lain.
-    ```bash
-    npm run build:installer
-    ```
-2.  **Build Portable version:**
-    Menghasilkan satu file `.exe` mandiri (Tanpa Install).
-    ```bash
-    npm run build:portable
-    ```
+Lihat `.ai/RULES.md` (aturan kerja), `.ai/STRUCTURE.md` (struktur folder),
+`.ai/UI.md` (komponen), `.ai/FUNCTIONS.md` (fungsi reusable),
+`.ai/COMMANDS.md` (perintah cargo).
 
-## 🛠️ Tech Stack
-- **Core:** JavaScript (ES6+), HTML5, CSS3 (Vanilla).
-- **Framework:** [Electron.js](https://www.electronjs.org/)
-- **Build Tool:** [electron-builder](https://www.electron.build/)
-
-## 📝 Lisensi
-Distribusi di bawah lisensi ISC.
-
----
-Dibuat dengan ❤️ untuk efisiensi kerja yang lebih baik.
+```
+src/  → main.rs (wiring), state.rs (AppStore), fs.rs (baca/cari), actions.rs (aksi OS)
+ui/   → app.slint (MainWindow), theme.slint (Theme), components/ (reusable)
+```

@@ -1,0 +1,34 @@
+// Tombol ikon kecil (aksi baris: Buka/Lihat, Refresh). Hover halus.
+import { Theme } from "../theme.slint";
+
+export component IconButton inherits Rectangle {
+    in property <image> icon;
+    in property <color> tint: Theme.text-muted;
+    in property <length> btn-size: 30px;
+    in property <length> icon-size: 16px;
+
+    callback clicked();
+
+    width: btn-size;
+    height: btn-size;
+    border-radius: Theme.radius-sm;
+    background: touch.has-hover ? Theme.bg-hover : transparent;
+
+    HorizontalLayout {
+        alignment: center;
+        VerticalLayout {
+            alignment: center;
+            Image {
+                source: icon;
+                width: icon-size;
+                height: icon-size;
+                colorize: touch.has-hover ? Theme.text-primary : tint;
+            }
+        }
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}

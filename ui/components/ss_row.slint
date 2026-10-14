@@ -1,0 +1,88 @@
+// Tabel spreadsheet — header ala .ss-table th versi lama (uppercase,
+// elevated, garis bawah) + baris dengan separator + sel warning tebal.
+import { Theme } from "../theme.slint";
+
+export struct SsRow {
+    c-no: string,
+    c-kode: string,
+    c-name: string,
+    c-cat: string,
+    c-uom: string,
+    c-p: string,
+    c-l: string,
+    c-t: string,
+    c-b: string,
+    row-incomplete: bool,
+    warn-p: bool,
+    warn-l: bool,
+    warn-t: bool,
+    warn-b: bool,
+}
+
+export component SsHeader inherits VerticalLayout {
+    spacing: 0px;
+    padding: 0px;
+    HorizontalLayout {
+        spacing: 8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 10px;
+        padding-right: 10px;
+        Text { text: "NO"; width: 44px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "KODE"; width: 100px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "NAME"; horizontal-stretch: 1; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "CAT"; width: 80px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "UOM"; width: 64px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "P"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "L"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "T"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+        Text { text: "B"; width: 52px; font-size: 11px; font-weight: 600; color: Theme.text-primary; }
+    }
+    Rectangle {
+        height: 2px;
+        background: Theme.border;
+    }
+}
+
+export component SsRowItem inherits Rectangle {
+    in property <string> c-no;
+    in property <string> c-kode;
+    in property <string> c-name;
+    in property <string> c-cat;
+    in property <string> c-uom;
+    in property <string> c-p;
+    in property <string> c-l;
+    in property <string> c-t;
+    in property <string> c-b;
+    in property <bool> row-incomplete;
+    in property <bool> warn-p;
+    in property <bool> warn-l;
+    in property <bool> warn-t;
+    in property <bool> warn-b;
+
+    background: row-incomplete ? Theme.warn-bg : transparent;
+
+    VerticalLayout {
+        spacing: 0px;
+        HorizontalLayout {
+            spacing: 8px;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 10px;
+            padding-right: 10px;
+            Text { text: c-no; width: 44px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-kode; width: 100px; font-size: 12px; color: Theme.text-primary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-name; horizontal-stretch: 1; font-size: 12px; color: Theme.text-primary; font-italic: row-incomplete; overflow: elide; vertical-alignment: center; }
+            Text { text: c-cat; width: 80px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-uom; width: 64px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-p; width: 52px; font-size: 12px; font-weight: warn-p ? 700 : 400; color: warn-p ? Theme.warn : Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-l; width: 52px; font-size: 12px; font-weight: warn-l ? 700 : 400; color: warn-l ? Theme.warn : Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-t; width: 52px; font-size: 12px; font-weight: warn-t ? 700 : 400; color: warn-t ? Theme.warn : Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+            Text { text: c-b; width: 52px; font-size: 12px; font-weight: warn-b ? 700 : 400; color: warn-b ? Theme.warn : Theme.text-secondary; overflow: elide; vertical-alignment: center; }
+        }
+        Rectangle {
+            height: 1px;
+            background: Theme.border;
+        }
+    }
+}
