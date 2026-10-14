@@ -29,6 +29,10 @@ tanpa Chromium. Binary ±10MB, RAM ±40-60MB.
 - Navigasi drill-down: klik baris/tile folder untuk masuk, breadcrumb
   klik untuk naik level; search berjalan dari posisi saat ini.
 - Toggle tampilan explorer list/grid (tile 6 kolom + scroll).
+- Layout 3 kolom (sidebar | panel tools | konten): search/filter/sort
+  pindah ke panel samping, konten khusus breadcrumb + hasil.
+- Esc di input cari (explorer + filter sheet) = kosongkan + reset hasil,
+  fokus tetap sehingga langsung bisa ketik query baru.
 - Build rilis tanpa jendela konsol (GUI murni); debug tetap
   pakai konsol agar log terlihat.
 

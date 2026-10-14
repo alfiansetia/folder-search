@@ -8,6 +8,9 @@ export component SearchField inherits Rectangle {
     in-out property <string> text;
     in property <string> placeholder-text;
     in property <bool> enabled: true;
+    // Esc = kosongkan input + tembak edited() (reset hasil, siap ketik baru).
+    // Matikan (false) untuk input yang tak boleh kehapus, mis. URL API.
+    in property <bool> esc-clears: true;
 
     callback accepted();
     callback edited(string);
@@ -35,21 +38,40 @@ export component SearchField inherits Rectangle {
                 height: 20px;
                 background: transparent;
 
-                input := TextInput {
-                    x: 0;
-                    y: 0;
+                // FocusScope: tangkap Esc (TextInput tak punya key-event mentah).
+                // Esc = kosongkan + tembak edited() agar hasil langsung reset;
+                // fokus dipertahankan supaya bisa langsung ketik query baru.
+                keys := FocusScope {
                     width: 100%;
                     height: 100%;
-                    text <=> root.text;
                     enabled: root.enabled;
-                    single-line: true;
-                    font-size: 13px;
-                    color: Theme.text-primary;
-                    selection-background-color: Theme.accent;
-                    selection-foreground-color: Theme.check-mark;
-                    vertical-alignment: center;
-                    accepted => { root.accepted(); }
-                    edited => { root.edited(root.text); }
+                    key-pressed(e) => {
+                        if e.text == Key.Escape && root.esc-clears {
+                            if root.text != "" {
+                                root.text = "";
+                                root.edited(root.text);
+                            }
+                            return accept;
+                        }
+                        return reject;
+                    }
+
+                    input := TextInput {
+                        x: 0;
+                        y: 0;
+                        width: 100%;
+                        height: 100%;
+                        text <=> root.text;
+                        enabled: root.enabled;
+                        single-line: true;
+                        font-size: 13px;
+                        color: Theme.text-primary;
+                        selection-background-color: Theme.accent;
+                        selection-foreground-color: Theme.check-mark;
+                        vertical-alignment: center;
+                        accepted => { root.accepted(); }
+                        edited => { root.edited(root.text); }
+                    }
                 }
 
                 // Placeholder manual (TextInput tak punya placeholder-text).

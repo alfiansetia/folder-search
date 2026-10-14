@@ -1,4 +1,4 @@
-// MainWindow — sidebar + 2 view. Detail di ui/components/.
+// MainWindow — 3 kolom: sidebar + panel tools + konten, 2 view. Detail di ui/components/.
 // Section label caps ala .tp-label versi lama. Empty-state bila list kosong.
 import { ListView, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { Theme } from "theme.slint";
@@ -136,171 +136,193 @@ export component MainWindow inherits Window {
             background: Theme.border;
         }
 
-        // ── Explorer view ──
-        if root.current-view == "explorer": VerticalLayout {
+        // ── Explorer view: 3 kolom (sidebar | tools | konten) ──
+        if root.current-view == "explorer": HorizontalLayout {
             horizontal-stretch: 1;
             vertical-stretch: 1;
-            padding: 14px;
-            spacing: 8px;
+            spacing: 0px;
 
-            Text {
-                text: "TARGET FOLDER";
-                font-size: 10px;
-                font-weight: 600;
-                color: Theme.text-muted;
-                letter-spacing: 0.6px;
-            }
+            // ── Panel tools: target + pencarian + opsi + urutan ──
             Rectangle {
-                background: Theme.bg-surface;
-                border-radius: Theme.radius;
-                border-width: 1px;
-                border-color: Theme.border;
+                width: 300px;
+                vertical-stretch: 1;
+                clip: true;
                 VerticalLayout {
-                    padding: 10px;
+                    padding: 14px;
                     spacing: 8px;
-                    HorizontalLayout {
-                        spacing: 10px;
-                        Image {
-                            source: @image-url("icons/target.svg");
-                            width: 26px;
-                            height: 26px;
-                            colorize: Theme.accent;
-                            vertical-alignment: center;
-                        }
+                    alignment: start;
+
+                    Text {
+                        text: "TARGET FOLDER";
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: Theme.text-muted;
+                        letter-spacing: 0.6px;
+                    }
+                    Rectangle {
+                        background: Theme.bg-surface;
+                        border-radius: Theme.radius;
+                        border-width: 1px;
+                        border-color: Theme.border;
                         VerticalLayout {
-                            horizontal-stretch: 1;
-                            spacing: 1px;
-                            Text {
-                                text: root.target-folder == "" ? "Belum dipilih" : root.target-folder;
-                                font-size: 13px;
-                                font-weight: 600;
-                                color: Theme.text-primary;
-                                overflow: elide;
+                            padding: 10px;
+                            spacing: 8px;
+                            HorizontalLayout {
+                                spacing: 10px;
+                                Image {
+                                    source: @image-url("icons/target.svg");
+                                    width: 26px;
+                                    height: 26px;
+                                    colorize: Theme.accent;
+                                    vertical-alignment: center;
+                                }
+                                VerticalLayout {
+                                    horizontal-stretch: 1;
+                                    spacing: 1px;
+                                    Text {
+                                        text: root.target-folder == "" ? "Belum dipilih" : root.target-folder;
+                                        font-size: 13px;
+                                        font-weight: 600;
+                                        color: Theme.text-primary;
+                                        overflow: elide;
+                                    }
+                                    Text {
+                                        text: root.target-folder == "" ? "Pilih folder untuk mulai menjelajah" : "Folder target aktif";
+                                        font-size: 10px;
+                                        color: Theme.text-muted;
+                                        overflow: elide;
+                                    }
+                                }
                             }
-                            Text {
-                                text: root.target-folder == "" ? "Pilih folder untuk mulai menjelajah" : "Folder target aktif";
-                                font-size: 10px;
-                                color: Theme.text-muted;
-                                overflow: elide;
+                            HorizontalLayout {
+                                spacing: 8px;
+                                AppButton {
+                                    text: "Pilih Folder";
+                                    primary: true;
+                                    horizontal-stretch: 1;
+                                    clicked => { root.pick-folder(); }
+                                }
+                                IconButton {
+                                    icon: @image-url("icons/refresh.svg");
+                                    tint: Theme.text-secondary;
+                                    clicked => { root.refresh(); }
+                                }
                             }
                         }
                     }
-                    HorizontalLayout {
+
+                    Text {
+                        text: "PENCARIAN";
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: Theme.text-muted;
+                        letter-spacing: 0.6px;
+                    }
+                    // Debounce search explorer: tiap ketikan restart timer 350ms,
+                    // search jalan saat user berhenti mengetik (hemat walk disk).
+                    // Enter/tombol Cari tetap langsung (tanpa tunggu timer).
+                    search-debounce := Timer {
+                        interval: 350ms;
+                        triggered => {
+                            self.stop();
+                            root.do-search();
+                        }
+                    }
+                    SearchField {
+                        text <=> root.search-query;
+                        placeholder-text: "Cari nama file/folder… (otomatis, Esc = hapus)";
+                        horizontal-stretch: 1;
+                        accepted => { root.do-search(); }
+                        edited(t) => { search-debounce.restart(); }
+                    }
+                    HorizontalBox {
                         spacing: 8px;
-                        AppButton {
-                            text: "Pilih Folder";
-                            primary: true;
-                            horizontal-stretch: 1;
-                            clicked => { root.pick-folder(); }
-                        }
-                        IconButton {
-                            icon: @image-url("icons/refresh.svg");
-                            tint: Theme.text-secondary;
-                            clicked => { root.refresh(); }
-                        }
+                        AppButton { text: "Cari"; primary: true; horizontal-stretch: 1; clicked => { root.do-search(); } }
+                        AppButton { text: "Reset"; horizontal-stretch: 1; clicked => { root.clear-search(); } }
+                    }
+                    VerticalLayout {
+                        spacing: 8px;
+                        CheckRow { label: "Recursive"; checked <=> root.opt-recursive; }
+                        CheckRow { label: "Case sensitive"; checked <=> root.opt-case; }
+                        CheckRow { label: "Exact match"; checked <=> root.opt-exact; }
+                    }
+
+                    Text {
+                        text: "URUTKAN";
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: Theme.text-muted;
+                        letter-spacing: 0.6px;
+                    }
+                    AppCombo {
+                        horizontal-stretch: 1;
+                        model: ["Nama", "Tipe", "Ukuran", "Terbaru"];
+                        current-value <=> root.sort-mode;
+                        selected(v) => { root.sort-mode = v; root.sort-changed(); }
                     }
                 }
             }
 
-            Text {
-                text: "PENCARIAN";
-                font-size: 10px;
-                font-weight: 600;
-                color: Theme.text-muted;
-                letter-spacing: 0.6px;
-            }
-            // Debounce search explorer: tiap ketikan restart timer 350ms,
-            // search jalan saat user berhenti mengetik (hemat walk disk).
-            // Enter/tombol Cari tetap langsung (tanpa tunggu timer).
-            search-debounce := Timer {
-                interval: 350ms;
-                triggered => {
-                    self.stop();
-                    root.do-search();
-                }
-            }
-            HorizontalBox {
-                spacing: 8px;
-                SearchField {
-                    text <=> root.search-query;
-                    placeholder-text: "Cari nama file/folder… (otomatis)";
-                    horizontal-stretch: 1;
-                    accepted => { root.do-search(); }
-                    edited(t) => { search-debounce.restart(); }
-                }
-                AppButton { text: "Cari"; primary: true; clicked => { root.do-search(); } }
-                AppButton { text: "Reset"; clicked => { root.clear-search(); } }
-            }
-            HorizontalBox {
-                spacing: 16px;
-                CheckRow { label: "Recursive"; checked <=> root.opt-recursive; }
-                CheckRow { label: "Case sensitive"; checked <=> root.opt-case; }
-                CheckRow { label: "Exact match"; checked <=> root.opt-exact; }
+            Rectangle {
+                width: 1px;
+                background: Theme.border;
             }
 
-            HorizontalBox {
+            // ── Panel konten: breadcrumb + status + hasil ──
+            VerticalLayout {
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+                padding: 14px;
                 spacing: 8px;
+
+                // Breadcrumb posisi saat ini + toggle tampilan list/grid.
+                // crumbs diisi Rust (target → current); klik crumb = naik ke level itu.
+                HorizontalBox {
+                    spacing: 6px;
+                    Rectangle {
+                        horizontal-stretch: 1;
+                        clip: true;
+                        HorizontalLayout {
+                            spacing: 2px;
+                            alignment: start;
+                            for c[i] in root.crumbs: HorizontalLayout {
+                                spacing: 2px;
+                                if i > 0: VerticalLayout {
+                                    alignment: center;
+                                    Text {
+                                        text: "›";
+                                        font-size: 12px;
+                                        color: Theme.text-muted;
+                                        vertical-alignment: center;
+                                    }
+                                }
+                                Crumb {
+                                    label: c;
+                                    active: i == root.crumbs.length - 1;
+                                    clicked => { root.nav-crumb(i); }
+                                }
+                            }
+                        }
+                    }
+                    IconButton {
+                        icon: @image-url("icons/list.svg");
+                        tint: root.view-mode == "list" ? Theme.accent : Theme.text-muted;
+                        clicked => { root.view-mode = "list"; }
+                    }
+                    IconButton {
+                        icon: @image-url("icons/grid.svg");
+                        tint: root.view-mode == "grid" ? Theme.accent : Theme.text-muted;
+                        clicked => { root.view-mode = "grid"; }
+                    }
+                }
+
                 Text {
                     text: root.status-text;
                     font-size: 11px;
                     color: Theme.text-secondary;
-                    horizontal-stretch: 1;
                     overflow: elide;
                     vertical-alignment: center;
                 }
-                Text {
-                    text: "Urut:";
-                    font-size: 11px;
-                    color: Theme.text-muted;
-                    vertical-alignment: center;
-                }
-                AppCombo {
-                    model: ["Nama", "Tipe", "Ukuran", "Terbaru"];
-                    current-value <=> root.sort-mode;
-                    selected(v) => { root.sort-mode = v; root.sort-changed(); }
-                }
-            }
-
-            // Breadcrumb posisi saat ini + toggle tampilan list/grid.
-            // crumbs diisi Rust (target → current); klik crumb = naik ke level itu.
-            if root.crumbs.length > 0: HorizontalBox {
-                spacing: 6px;
-                Rectangle {
-                    horizontal-stretch: 1;
-                    clip: true;
-                    HorizontalLayout {
-                        spacing: 2px;
-                        alignment: start;
-                        for c[i] in root.crumbs: HorizontalLayout {
-                            spacing: 2px;
-                            if i > 0: VerticalLayout {
-                                alignment: center;
-                                Text {
-                                    text: "›";
-                                    font-size: 12px;
-                                    color: Theme.text-muted;
-                                    vertical-alignment: center;
-                                }
-                            }
-                            Crumb {
-                                label: c;
-                                active: i == root.crumbs.length - 1;
-                                clicked => { root.nav-crumb(i); }
-                            }
-                        }
-                    }
-                }
-                IconButton {
-                    icon: @image-url("icons/list.svg");
-                    tint: root.view-mode == "list" ? Theme.accent : Theme.text-muted;
-                    clicked => { root.view-mode = "list"; }
-                }
-                IconButton {
-                    icon: @image-url("icons/grid.svg");
-                    tint: root.view-mode == "grid" ? Theme.accent : Theme.text-muted;
-                    clicked => { root.view-mode = "grid"; }
-                }
-            }
 
             // Area konten utama: selalu stretch penuh agar window tidak mengecil
             Rectangle {
@@ -352,7 +374,7 @@ export component MainWindow inherits Window {
                         }
                         Text {
                             text: root.target-folder == ""
-                                ? "Klik tombol Pilih Folder di atas"
+                                ? "Klik tombol Pilih Folder di panel samping"
                                 : root.is-search-mode
                                     ? "Coba kata kunci lain atau ubah opsi pencarian"
                                     : "Tidak ada file atau subfolder di sini";
@@ -408,139 +430,161 @@ export component MainWindow inherits Window {
                 }
             }
         }
+        }
 
-        // ── Spreadsheet view ──
-        if root.current-view == "spreadsheet": VerticalLayout {
+        // ── Spreadsheet view: 3 kolom (sidebar | tools | konten) ──
+        if root.current-view == "spreadsheet": HorizontalLayout {
             horizontal-stretch: 1;
             vertical-stretch: 1;
-            padding: 14px;
-            spacing: 8px;
+            spacing: 0px;
 
-            Text {
-                text: "SUMBER DATA";
-                font-size: 10px;
-                font-weight: 600;
-                color: Theme.text-muted;
-                letter-spacing: 0.6px;
-            }
-            HorizontalBox {
-                spacing: 8px;
-                SearchField {
-                    text <=> root.ss-url;
-                    placeholder-text: "https://…/api… (JSON Array)";
-                    horizontal-stretch: 1;
-                    enabled: !root.ss-loading;
-                    accepted => { root.ss-fetch(); }
-                }
-                AppButton {
-                    has-icon: true;
-                    icon: @image-url("icons/download.svg");
-                    text: root.ss-loading ? "Memuat…" : "Ambil Data";
-                    primary: true;
-                    enabled: !root.ss-loading;
-                    clicked => { root.ss-fetch(); }
-                }
-            }
-
-            Text {
-                text: "FILTER";
-                font-size: 10px;
-                font-weight: 600;
-                color: Theme.text-muted;
-                letter-spacing: 0.6px;
-            }
-            HorizontalBox {
-                spacing: 8px;
-                SearchField {
-                    text <=> root.ss-query;
-                    placeholder-text: "Cari NO / KODE / NAME…";
-                    horizontal-stretch: 1;
-                    edited(t) => { root.ss-apply-filter(); }
-                }
-                AppCombo {
-                    model: ["Semua", "Lengkap", "Tidak Lengkap"];
-                    current-value <=> root.ss-status-label;
-                    selected(v) => { root.ss-status-label = v; root.ss-apply-filter(); }
-                }
-            }
-
-            Text {
-                text: root.ss-status-text;
-                font-size: 11px;
-                color: Theme.text-secondary;
-                overflow: elide;
-            }
-
+            // ── Panel tools: sumber data + filter ──
             Rectangle {
-                background: Theme.bg-surface;
-                border-radius: Theme.radius;
-                border-width: 1px;
-                border-color: Theme.border;
+                width: 300px;
                 vertical-stretch: 1;
                 clip: true;
                 VerticalLayout {
-                    spacing: 0px;
-                    padding: 0px;
-                    SsHeader { }
-                    if root.ss-results.length == 0: Rectangle {
-                        vertical-stretch: 1;
-                        background: transparent;
-                        VerticalLayout {
-                            alignment: center;
-                            spacing: 12px;
-                            HorizontalLayout {
+                    padding: 14px;
+                    spacing: 8px;
+                    alignment: start;
+
+                    Text {
+                        text: "SUMBER DATA";
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: Theme.text-muted;
+                        letter-spacing: 0.6px;
+                    }
+                    SearchField {
+                        text <=> root.ss-url;
+                        placeholder-text: "https://…/api… (JSON Array)";
+                        esc-clears: false;
+                        horizontal-stretch: 1;
+                        enabled: !root.ss-loading;
+                        accepted => { root.ss-fetch(); }
+                    }
+                    AppButton {
+                        has-icon: true;
+                        icon: @image-url("icons/download.svg");
+                        text: root.ss-loading ? "Memuat…" : "Ambil Data";
+                        primary: true;
+                        horizontal-stretch: 1;
+                        enabled: !root.ss-loading;
+                        clicked => { root.ss-fetch(); }
+                    }
+
+                    Text {
+                        text: "FILTER";
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: Theme.text-muted;
+                        letter-spacing: 0.6px;
+                    }
+                    SearchField {
+                        text <=> root.ss-query;
+                        placeholder-text: "Cari NO / KODE / NAME… (Esc = hapus)";
+                        horizontal-stretch: 1;
+                        edited(t) => { root.ss-apply-filter(); }
+                    }
+                    AppCombo {
+                        horizontal-stretch: 1;
+                        model: ["Semua", "Lengkap", "Tidak Lengkap"];
+                        current-value <=> root.ss-status-label;
+                        selected(v) => { root.ss-status-label = v; root.ss-apply-filter(); }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1px;
+                background: Theme.border;
+            }
+
+            // ── Panel konten: status + tabel ──
+            VerticalLayout {
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+                padding: 14px;
+                spacing: 8px;
+
+                Text {
+                    text: root.ss-status-text;
+                    font-size: 11px;
+                    color: Theme.text-secondary;
+                    overflow: elide;
+                }
+
+                Rectangle {
+                    background: Theme.bg-surface;
+                    border-radius: Theme.radius;
+                    border-width: 1px;
+                    border-color: Theme.border;
+                    vertical-stretch: 1;
+                    clip: true;
+                    VerticalLayout {
+                        spacing: 0px;
+                        padding: 0px;
+                        SsHeader { }
+                        if root.ss-results.length == 0: Rectangle {
+                            vertical-stretch: 1;
+                            background: transparent;
+                            VerticalLayout {
                                 alignment: center;
-                                Rectangle {
-                                    width: 52px;
-                                    height: 52px;
-                                    border-radius: 26px;
-                                    background: Theme.accent-dim;
-                                    HorizontalLayout {
-                                        alignment: center;
-                                        VerticalLayout {
+                                spacing: 12px;
+                                HorizontalLayout {
+                                    alignment: center;
+                                    Rectangle {
+                                        width: 52px;
+                                        height: 52px;
+                                        border-radius: 26px;
+                                        background: Theme.accent-dim;
+                                        HorizontalLayout {
                                             alignment: center;
-                                            Image {
-                                                source: @image-url("icons/grid.svg");
-                                                width: 26px;
-                                                height: 26px;
-                                                colorize: Theme.accent-light;
+                                            VerticalLayout {
+                                                alignment: center;
+                                                Image {
+                                                    source: @image-url("icons/grid.svg");
+                                                    width: 26px;
+                                                    height: 26px;
+                                                    colorize: Theme.accent-light;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                            Text {
-                                text: "Belum ada data";
-                                font-size: 14px;
-                                font-weight: 500;
-                                color: Theme.text-secondary;
-                                horizontal-alignment: center;
-                            }
-                            Text {
-                                text: "Masukkan URL API di atas lalu klik Ambil Data";
-                                font-size: 12px;
-                                color: Theme.text-muted;
-                                horizontal-alignment: center;
+                                Text {
+                                    text: "Belum ada data";
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    color: Theme.text-secondary;
+                                    horizontal-alignment: center;
+                                }
+                                Text {
+                                    text: "Masukkan URL API di panel samping lalu klik Ambil Data";
+                                    font-size: 12px;
+                                    color: Theme.text-muted;
+                                    horizontal-alignment: center;
+                                }
                             }
                         }
-                    }
-                    if root.ss-results.length > 0: ListView {
-                        vertical-stretch: 1;
-                        for row[idx] in root.ss-results: SsRowItem {
-                            c-no: row.c-no;
-                            c-kode: row.c-kode;
-                            c-name: row.c-name;
-                            c-cat: row.c-cat;
-                            c-uom: row.c-uom;
-                            c-p: row.c-p;
-                            c-l: row.c-l;
-                            c-t: row.c-t;
-                            c-b: row.c-b;
-                            row-incomplete: row.row-incomplete;
-                            warn-p: row.warn-p;
-                            warn-l: row.warn-l;
-                            warn-t: row.warn-t;
-                            warn-b: row.warn-b;
+                        if root.ss-results.length > 0: ListView {
+                            vertical-stretch: 1;
+                            for row[idx] in root.ss-results: SsRowItem {
+                                c-no: row.c-no;
+                                c-kode: row.c-kode;
+                                c-name: row.c-name;
+                                c-cat: row.c-cat;
+                                c-uom: row.c-uom;
+                                c-p: row.c-p;
+                                c-l: row.c-l;
+                                c-t: row.c-t;
+                                c-b: row.c-b;
+                                row-incomplete: row.row-incomplete;
+                                warn-p: row.warn-p;
+                                warn-l: row.warn-l;
+                                warn-t: row.warn-t;
+                                warn-b: row.warn-b;
+                            }
                         }
                     }
                 }
