@@ -9,6 +9,10 @@
 //!   dilarang (lihat `state.rs`).
 //! Jangan taruh logika bisnis di sini. Lihat `.ai/RULES.md`.
 
+// Rilis: tanpa jendela konsol (aplikasi GUI murni). Debug tetap pakai
+// konsol agar println!/panic terlihat saat `cargo run`.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 slint::include_modules!();
 
 mod actions;

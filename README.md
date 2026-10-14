@@ -1,15 +1,18 @@
-# FolderScope Native — File Manager (Rust + Slint)
+# FolderScope 2.0 — File Manager + Spreadsheet Viewer (Rust + Slint)
 
-Rewrite native dari versi Electron lama: tanpa webview, tanpa Chromium.
-Binary ~6-10MB, RAM ~40-60MB.
+Rewrite native dari v1 (Electron): tanpa webview, tanpa Chromium.
+Binary ±10MB, RAM ±40-60MB. Lihat `CHANGELOG.md` untuk riwayat versi.
 
-## Fitur (v0.1.0)
+## Fitur (v2.0.0)
 
-- Pilih folder target (dialog native) + listing sort A-Z.
-- Search paralel multi-thread (recursive, case sensitive, exact match),
+- Explorer: pilih folder target (dialog native) + listing sortir
+  (Nama/Tipe/Ukuran/Terbaru).
+- Search multi-thread (recursive, case sensitive, exact match),
   max 500 hasil + waktu pencarian (ms), max depth 10.
 - Buka file/folder via aplikasi default + "Lihat" di File Explorer.
-- UI dark native (Slint, GPU).
+- Spreadsheet viewer: tarik JSON Array dari URL API + filter live,
+  cache lokal (folder terakhir, URL, data, tema).
+- Tema Gelap/Terang + UI dark native (Slint, GPU).
 
 ## Prasyarat
 
@@ -21,6 +24,16 @@ Binary ~6-10MB, RAM ~40-60MB.
 ```powershell
 cargo run
 ```
+
+## Build & Installer
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-installer.ps1
+```
+
+Menghasilkan `dist/FolderScope-2.0.0-portable.zip` (tanpa dependensi
+tambahan) dan `dist/FolderScope-Setup-2.0.0.exe` (butuh Inno Setup 6:
+`winget install JRSoftware.InnoSetup`). Panduan lengkap: `docs/BUILD.md`.
 
 ## Struktur
 

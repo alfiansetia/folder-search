@@ -17,9 +17,19 @@
 │   ├── icons/             # SVG stroke-putih (folder, file, …); tampil via colorize.
 │   └── components/
 │       ├── file_row.slint # Struct FileRow + FileRowItem (list explorer).
-│       └── ss_row.slint   # Struct SsRow + SsHeader + SsRowItem (tabel SS).
+│       ├── ss_row.slint   # Struct SsRow + SsHeader + SsRowItem (tabel SS).
+│       ├── nav_button.slint, icon_button.slint  # Tombol sidebar + tombol ikon.
+│       ├── check_row.slint, search_field.slint  # Checkbox + input teks bertema.
+│       └── app_button.slint, app_combo.slint    # Tombol + dropdown bertema.
 ├── assets/
-│   └── icon.png           # Ikon aplikasi.
+│   ├── icon.jpg           # Ikon aplikasi (JPEG — JANGAN rename ke .png).
+│   └── icon.ico           # Multi-ukuran, dari icon.jpg via scripts/make-icon.ps1; di-embed ke exe (winres) + installer.
+├── installer.iss          # Skrip installer Inno Setup 6 (output ke dist/).
+├── scripts/
+│   └── build-installer.ps1  # Build rilis + portable zip + installer.
+├── docs/
+│   └── BUILD.md           # Panduan build & installer.
+├── CHANGELOG.md           # Riwayat versi (v2.0.0 = rewrite Rust+Slint).
 └── .ai/                   # Aturan kerja (RULES/STRUCTURE/UI/FUNCTIONS/COMMANDS/BACKLOG).
 ```
 

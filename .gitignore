@@ -3,6 +3,9 @@
 **/*.rs.bk
 *.pdb
 
+# Build output (portable zip + installer, lihat docs/BUILD.md)
+/dist/
+
 # IDE
 .vscode/
 .idea/

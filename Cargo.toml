@@ -1,8 +1,8 @@
 [package]
 name = "folderscope"
-version = "0.1.0"
+version = "2.0.0"
 edition = "2021"
-description = "FolderScope Native — file manager (Rust + Slint, tanpa webview)"
+description = "FolderScope 2.0 — file manager + spreadsheet viewer (Rust + Slint, tanpa webview)"
 
 [dependencies]
 slint = "1.10"
@@ -16,3 +16,4 @@ dirs = "5"
 
 [build-dependencies]
 slint-build = "1.10"
+winres = "0.1"

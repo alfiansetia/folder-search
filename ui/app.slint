@@ -203,13 +203,24 @@ export component MainWindow inherits Window {
                 color: Theme.text-muted;
                 letter-spacing: 0.6px;
             }
+            // Debounce search explorer: tiap ketikan restart timer 350ms,
+            // search jalan saat user berhenti mengetik (hemat walk disk).
+            // Enter/tombol Cari tetap langsung (tanpa tunggu timer).
+            search-debounce := Timer {
+                interval: 350ms;
+                triggered => {
+                    self.stop();
+                    root.do-search();
+                }
+            }
             HorizontalBox {
                 spacing: 8px;
                 SearchField {
                     text <=> root.search-query;
-                    placeholder-text: "Cari nama file/folder… (Enter = cari)";
+                    placeholder-text: "Cari nama file/folder… (otomatis)";
                     horizontal-stretch: 1;
                     accepted => { root.do-search(); }
+                    edited(t) => { search-debounce.restart(); }
                 }
                 AppButton { text: "Cari"; primary: true; clicked => { root.do-search(); } }
                 AppButton { text: "Reset"; clicked => { root.clear-search(); } }
