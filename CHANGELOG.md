@@ -1,5 +1,15 @@
 # Changelog — FolderScope
 
+## [2.0.1]
+
+- Spreadsheet: kolom KODE tanpa batas potong — teks panjang wrap
+  penuh (sebelumnya fix 100px + elide "…").
+- Explorer: search selalu dari folder target (root), bukan dari
+  posisi breadcrumb/subfolder aktif.
+- Explorer: perbaiki list kedip/refresh berulang — timer debounce
+  di-stop saat Cari/Reset/Enter, dan timer sisa diabaikan bila query
+  kosong di luar search-mode (mis. setelah masuk folder/breadcrumb).
+
 ## [2.0.0] — rewrite native
 
 Rewrite penuh dari v1 (Electron) ke Rust + Slint: tanpa webview,

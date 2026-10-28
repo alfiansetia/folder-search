@@ -1,10 +1,10 @@
 ; FolderScope 2.0 — skrip installer Inno Setup (Windows 64-bit).
 ; Cara pakai: install Inno Setup 6, lalu jalankan scripts/build-installer.ps1
 ; atau: iscc installer.iss
-; Hasil: dist\FolderScope-Setup-2.0.0.exe
+; Hasil: dist\FolderScope-Setup-2.0.1.exe
 
 #define MyAppName "FolderScope"
-#define MyAppVersion "2.0.0"
+#define MyAppVersion "2.0.1"
 #define MyAppExe "folderscope.exe"
 
 [Setup]

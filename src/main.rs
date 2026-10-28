@@ -113,9 +113,9 @@ fn show_dir_listing(w: &MainWindow, store: &AppStore) {
 }
 
 /// Cari + sort + tampilkan (satu-satunya jalur search explorer).
-/// Search berjalan dari folder saat ini (posisi breadcrumb).
+/// Search SELALU dari folder target (root), bukan dari posisi breadcrumb.
 fn run_search(w: &MainWindow, store: &AppStore) {
-    let Some(dir) = current_dir(store) else {
+    let Some(dir) = store.get_target() else {
         w.set_status_text("Pilih folder target dulu.".into());
         return;
     };

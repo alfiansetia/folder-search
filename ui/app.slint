@@ -218,27 +218,35 @@ export component MainWindow inherits Window {
                         color: Theme.text-muted;
                         letter-spacing: 0.6px;
                     }
-                    // Debounce search explorer: tiap ketikan restart timer 350ms,
+                    // Debounce search explorer: tiap ketikan restart timer,
                     // search jalan saat user berhenti mengetik (hemat walk disk).
-                    // Enter/tombol Cari tetap langsung (tanpa tunggu timer).
+                    // Enter/tombol Cari langsung (stop timer dulu agar tidak
+                    // double-search → publish 2x → list kedip).
+                    // Guard di triggered: abaikan timer sisa bila query kosong
+                    // dan sedang tidak search-mode (mis. timer yang terlanjur
+                    // restart oleh set-search-query programmatic saat masuk
+                    // folder / breadcrumb / reset — listing sudah ditampilkan
+                    // langsung, tanpa guard ia refresh ulang → "kedip terus").
                     search-debounce := Timer {
-                        interval: 350ms;
+                        interval: 400ms;
                         triggered => {
                             self.stop();
-                            root.do-search();
+                            if (root.search-query != "" || root.is-search-mode) {
+                                root.do-search();
+                            }
                         }
                     }
                     SearchField {
                         text <=> root.search-query;
                         placeholder-text: "Cari nama file/folder… (otomatis, Esc = hapus)";
                         horizontal-stretch: 1;
-                        accepted => { root.do-search(); }
+                        accepted => { search-debounce.stop(); root.do-search(); }
                         edited(t) => { search-debounce.restart(); }
                     }
                     HorizontalBox {
                         spacing: 8px;
-                        AppButton { text: "Cari"; primary: true; horizontal-stretch: 1; clicked => { root.do-search(); } }
-                        AppButton { text: "Reset"; horizontal-stretch: 1; clicked => { root.clear-search(); } }
+                        AppButton { text: "Cari"; primary: true; horizontal-stretch: 1; clicked => { search-debounce.stop(); root.do-search(); } }
+                        AppButton { text: "Reset"; horizontal-stretch: 1; clicked => { search-debounce.stop(); root.clear-search(); } }
                     }
                     VerticalLayout {
                         spacing: 8px;

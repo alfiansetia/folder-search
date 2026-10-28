@@ -34,7 +34,7 @@ export component SsHeader inherits VerticalLayout {
             padding-left: 10px;
             padding-right: 10px;
             Text { text: "NO"; width: 44px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
-            Text { text: "KODE"; width: 100px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
+            Text { text: "KODE"; width: 150px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
             Text { text: "NAME"; horizontal-stretch: 1; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
             Text { text: "CAT"; width: 80px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
             Text { text: "UOM"; width: 64px; font-size: 11px; font-weight: 600; color: Theme.text-secondary; letter-spacing: 0.4px; }
@@ -78,7 +78,7 @@ export component SsRowItem inherits Rectangle {
             padding-left: 10px;
             padding-right: 10px;
             Text { text: c-no; width: 44px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
-            Text { text: c-kode; width: 100px; font-size: 12px; color: Theme.text-primary; font-weight: 500; overflow: elide; vertical-alignment: center; }
+            Text { text: c-kode; width: 150px; font-size: 12px; color: Theme.text-primary; font-weight: 500; wrap: word-wrap; vertical-alignment: center; }
             Text { text: c-name; horizontal-stretch: 1; font-size: 12px; color: Theme.text-primary; font-italic: row-incomplete; overflow: elide; vertical-alignment: center; }
             Text { text: c-cat; width: 80px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
             Text { text: c-uom; width: 64px; font-size: 12px; color: Theme.text-secondary; overflow: elide; vertical-alignment: center; }
